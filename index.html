@@ -3,193 +3,179 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mutatieles 5: Porto, Chatbot & ASTMA</title>
-  <!-- Tailwind CSS via CDN -->
+  <title>C2000 Live Voice Porto & ASTMA</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
-    /* Mobile-first styling & voorkomen van pinch-zoom haperingen */
-    body {
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
+    body { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     .lcd-screen {
-      background-color: #7b9971;
-      color: #142211;
+      background-color: #648259;
+      color: #0b1709;
       font-family: 'Courier New', Courier, monospace;
-      text-shadow: 1px 1px 0px rgba(255,255,255,0.2);
+      text-shadow: 1px 1px 0px rgba(255,255,255,0.25);
     }
-    .chat-bubble-bot {
-      background-color: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 1rem 1rem 1rem 0.2rem;
+    .ptt-active {
+      background-color: #dc2626 !important;
+      transform: scale(0.97);
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.5);
     }
-    .chat-bubble-user {
-      background-color: #2563eb;
-      border-radius: 1rem 1rem 0.2rem 1rem;
-    }
-    /* Zorg voor nette scrollbars op mobiel */
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #475569;
-      border-radius: 4px;
-    }
+    .chat-bubble-bot { background-color: #1e293b; border-radius: 1rem 1rem 1rem 0.2rem; }
+    .chat-bubble-user { background-color: #2563eb; border-radius: 1rem 1rem 0.2rem 1rem; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans antialiased selection:bg-blue-600">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans select-none antialiased">
 
-  <!-- MOBIELE TOPBAR -->
-  <header class="bg-slate-900/95 backdrop-blur border-b border-slate-800 sticky top-0 z-40 px-3 py-2.5 flex items-center justify-between shadow-md">
+  <!-- ACTIVATIE BANNER VOOR MICROFOON & AUDIO -->
+  <div id="mic-perm-banner" onclick="initMicAndAudio()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2 px-3 text-center cursor-pointer flex items-center justify-center gap-2 sticky top-0 z-50 shadow-lg transition">
+    <i class="fa-solid fa-microphone-lines animate-pulse text-sm"></i>
+    <span id="mic-status-label">TIK HIER OM MICROFOON & PORTO-AUDIO TE STARTEN</span>
+  </div>
+
+  <!-- MOBIELE STATUS BALK -->
+  <header class="bg-slate-900 border-b border-slate-800 px-3 py-2 flex items-center justify-between sticky top-0 z-40">
     <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm shadow">
-        <i class="fa-solid fa-walkie-talkie"></i>
-      </div>
-      <div>
-        <h1 class="text-xs font-black tracking-wide text-white flex items-center gap-1.5">
-          MUTATIELES 5 <span class="bg-blue-500/20 text-blue-400 text-[10px] px-1.5 py-0.2 rounded border border-blue-500/30">C2000</span>
-        </h1>
-        <p class="text-[10px] text-slate-400 font-medium">Signalement & Gouden W's</p>
-      </div>
+      <div id="conn-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400" title="Verbonden"></div>
+      <h1 class="text-xs font-black tracking-wide text-white">
+        C2000 LIVE VOORTO
+      </h1>
     </div>
 
-    <!-- Quick Duo & Role Status + Reset Knop -->
     <div class="flex items-center gap-1.5">
       <select id="channel-select" class="bg-slate-800 border border-slate-700 text-amber-300 font-bold text-xs rounded-lg px-2 py-1 focus:outline-none">
-        <!-- Wordt gevuld met JS (Duo 1 t/m 15) -->
+        <!-- Vult DUO-01 t/m DUO-15 -->
       </select>
-      <button onclick="manualSwitchRole()" id="role-quick-btn" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-blue-400">
+      <button onclick="toggleUserRole()" id="role-toggle-btn" class="bg-slate-800 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-blue-400">
         🏃 Loper
       </button>
-      <button onclick="resetWholeDatabase()" title="Gehele database resetten" class="bg-red-950/60 hover:bg-red-900 border border-red-700/60 text-red-400 text-xs w-7 h-7 rounded-lg flex items-center justify-center">
+      <button onclick="resetWholeDatabase()" title="Gehele database resetten" class="bg-red-950/70 border border-red-700/60 text-red-400 text-xs w-7 h-7 rounded-lg flex items-center justify-center">
         <i class="fa-solid fa-trash-can text-[11px]"></i>
       </button>
     </div>
   </header>
 
-  <!-- HOOFDCONTAINER MET TABBLADEN -->
-  <main class="max-w-xl mx-auto px-3 pt-3">
+  <main class="max-w-md mx-auto px-3 pt-3">
 
     <!-- =========================================================================
-         TAB 1: PORTOFOON & UITGIFTE (C2000)
+         TAB 1: DE PORTOFOON MET ECHTE SPRAAK (PTT)
          ========================================================================= -->
-    <section id="tab-porto" class="tab-content space-y-4">
+    <section id="tab-porto" class="tab-content space-y-3">
 
-      <!-- C2000 Handheld Behuizing -->
-      <div class="bg-slate-900 rounded-3xl p-4 border-2 border-slate-700 shadow-2xl relative mx-auto max-w-sm">
-        <!-- Antenne & Knop bovenaan -->
-        <div class="w-3.5 h-8 bg-slate-700 absolute -top-8 left-8 rounded-t border-t border-slate-500"></div>
-        <div class="w-6 h-4 bg-slate-800 absolute -top-4 right-8 rounded-t border border-slate-600"></div>
+      <div class="bg-slate-900 rounded-3xl p-4 border-2 border-slate-700 shadow-2xl relative">
+        <div class="w-3.5 h-7 bg-slate-700 absolute -top-7 left-8 rounded-t border-t border-slate-500"></div>
 
         <!-- Speaker grill -->
-        <div class="flex justify-center gap-1 mb-2.5">
+        <div class="flex justify-center gap-1 mb-2">
           <div class="w-8 h-1 bg-slate-800 rounded-full"></div>
           <div class="w-12 h-1 bg-slate-800 rounded-full"></div>
           <div class="w-8 h-1 bg-slate-800 rounded-full"></div>
         </div>
 
-        <!-- Portofoon LCD Matrix Scherm -->
-        <div class="lcd-screen rounded-xl p-3 mb-3 border-2 border-slate-600 shadow-inner min-h-[130px] flex flex-col justify-between">
-          <div class="flex justify-between items-center text-[10px] font-black border-b border-slate-800/20 pb-1">
-            <span id="lcd-channel-tag">CH: DUO-01</span>
-            <span id="lcd-live-status" class="animate-pulse">● STAND-BY</span>
+        <!-- LCD Scherm -->
+        <div class="lcd-screen rounded-xl p-3 mb-3 border-2 border-slate-600 shadow-inner flex flex-col justify-between min-h-[125px]">
+          <div class="flex justify-between items-center text-[10px] font-black border-b border-slate-900/20 pb-1">
+            <span id="lcd-channel-label">CH: DUO-01</span>
+            <span id="lcd-status-label" class="animate-pulse">● STAND-BY</span>
           </div>
-
           <div class="py-2 text-center">
-            <div id="lcd-headline" class="text-xs font-black tracking-wider uppercase leading-snug">
-              Wachten op oproep...
+            <div id="lcd-main-title" class="text-xs font-black tracking-wider uppercase leading-tight">
+              KANAAL OPEN
             </div>
-            <div id="lcd-subline" class="text-[11px] font-semibold mt-1 opacity-80">
-              Meldkamer paraat
+            <div id="lcd-sub-title" class="text-[11px] font-bold mt-1 opacity-85">
+              Houd PTT ingedrukt om te praten
             </div>
           </div>
-
-          <div class="flex justify-between items-center text-[9px] pt-1 border-t border-slate-800/20 font-bold">
-            <span>DMO / TMO</span>
+          <div class="flex justify-between items-center text-[9px] pt-1 border-t border-slate-900/20 font-bold">
+            <span id="lcd-role-label">ROL: LOPER</span>
             <span id="lcd-loc-tag">LOC: GEEN</span>
           </div>
         </div>
 
-        <!-- BEDIENING VOOR STUDENT 2: OC (MELDKAMER) -->
-        <div id="panel-oc" class="space-y-2.5 hidden">
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-xs">
-            <span class="text-amber-400 font-bold block mb-1 text-[11px]"><i class="fa-solid fa-headset"></i> OC INCIDENTEN-KAART:</span>
-            <p id="oc-briefing-text" class="text-slate-300 italic text-[11px]">Druk op 'Nieuw Incident' om een casus toe te wijzen.</p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="pickRandomCaseForOC()" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 border border-slate-700">
-              <i class="fa-solid fa-shuffle"></i> Nieuw Incident
+        <!-- PUSH TO TALK KNOPPEN & BEDIENING -->
+        <div class="space-y-2.5">
+          
+          <!-- HOUD INGEDRUKT OM ECHT TE PRATEN (PTT) -->
+          <div class="relative">
+            <button id="btn-ptt"
+                    class="w-full bg-amber-600 hover:bg-amber-500 active:bg-red-600 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition select-none cursor-pointer">
+              <i class="fa-solid fa-microphone text-base"></i>
+              <span id="ptt-label">HOUD INGEDRUKT OM TE PRATEN (PTT)</span>
             </button>
-            <button onclick="dispatchUnitViaPorto()" class="bg-amber-600 hover:bg-amber-500 text-white font-black py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-amber-950">
-              <i class="fa-solid fa-tower-broadcast"></i> Zend Oproep (PTT)
+            <div class="text-[9px] text-center text-slate-400 mt-1">
+              Laat los om je spraak direct over de porto te verzenden
+            </div>
+          </div>
+
+          <!-- SCHERM SPECIFIEK VOOR OC -->
+          <div id="view-oc" class="hidden space-y-2 pt-1 border-t border-slate-800">
+            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-amber-400 font-bold text-[11px]"><i class="fa-solid fa-headset"></i> MELDING:</span>
+                <button onclick="pickRandomCaseForOC()" class="bg-slate-800 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-700">
+                  <i class="fa-solid fa-shuffle"></i> Nieuw Incident
+                </button>
+              </div>
+              <p id="oc-briefing-text" class="text-slate-300 italic text-[11px]">Druk op 'Nieuw Incident' om een melding op te roepen.</p>
+            </div>
+            <button onclick="broadcastCaseToPartner()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-paper-plane text-blue-400"></i> Stuur Locatie & Details Naar Loper
             </button>
           </div>
-        </div>
 
-        <!-- BEDIENING VOOR STUDENT 1: LOPER (EENHEID) -->
-        <div id="panel-loper" class="space-y-3">
-          <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-xs">
-            <span class="text-blue-400 font-bold block mb-1 text-[11px]"><i class="fa-solid fa-person-walking"></i> HUIDIGE OPDRACHT:</span>
-            <p id="loper-instruction-text" class="text-slate-300 text-[11px] leading-relaxed">
-              Wacht tot de meldkamer (Student 2) jou via de portofoon naar een etage in het gebouw stuurt...
-            </p>
+          <!-- SCHERM SPECIFIEK VOOR LOPER -->
+          <div id="view-loper" class="space-y-2 pt-1 border-t border-slate-800">
+            <div id="loper-mission-box" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
+              <span class="text-blue-400 font-bold block mb-0.5 text-[11px]"><i class="fa-solid fa-location-dot"></i> OPDRACHT VAN DE OC:</span>
+              <p id="loper-instruction" class="text-slate-300 text-[11px]">
+                Wacht tot de meldkamer via de porto spreekt en je naar een locatie in het gebouw stuurt...
+              </p>
+            </div>
+            <button id="btn-arrived" onclick="unitArrivedAtScene()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
+              <i class="fa-solid fa-flag-checkered text-base"></i> 📍 Ik ben ter plaatse / Ik ben er
+            </button>
           </div>
 
-          <!-- GROTE KNOP: IK BEN ER -->
-          <button id="btn-arrived" onclick="unitArrivedAtScene()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition">
-            <i class="fa-solid fa-location-dot text-base"></i> 📍 Ik ben ter plaatse / Ik ben er
-          </button>
         </div>
-
       </div>
 
-      <!-- Overzicht van de 5 locaties in het gebouw ter referentie -->
-      <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-800/80 text-[11px] text-slate-400">
-        <span class="font-bold text-slate-300 block mb-1.5"><i class="fa-solid fa-building text-blue-400"></i> Locaties in dit gebouw:</span>
-        <ul class="grid grid-cols-1 gap-1 text-[10px]">
-          <li><strong class="text-blue-400">a:</strong> Onderwijsondersteuning (3e etage)</li>
-          <li><strong class="text-blue-400">b:</strong> Receptie (begane grond)</li>
-          <li><strong class="text-blue-400">c:</strong> Balie (2e etage)</li>
-          <li><strong class="text-blue-400">d:</strong> Hal voor klapdeuren docentenafdeling (5e etage)</li>
-          <li><strong class="text-blue-400">e:</strong> Ronde studieruimte (4e etage)</li>
-        </ul>
+      <!-- Overzicht Gebouwlocaties -->
+      <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-800 text-[11px] text-slate-400">
+        <span class="font-bold text-slate-300 block mb-1"><i class="fa-solid fa-building text-blue-400"></i> Locaties in het gebouw:</span>
+        <div class="grid grid-cols-1 gap-0.5 text-[10px]">
+          <div><strong class="text-blue-400">a:</strong> Onderwijsondersteuning (3e etage)</div>
+          <div><strong class="text-blue-400">b:</strong> Receptie (begane grond)</div>
+          <div><strong class="text-blue-400">c:</strong> Balie (2e etage)</div>
+          <div><strong class="text-blue-400">d:</strong> Hal voor klapdeuren docentenafdeling (5e etage)</div>
+          <div><strong class="text-blue-400">e:</strong> Ronde studieruimte (4e etage)</div>
+        </div>
       </div>
 
     </section>
 
     <!-- =========================================================================
-         TAB 2: INTERACTIEVE VERHOOR CHATBOT (7 GOUDEN W'S)
+         TAB 2: VERHOOR CHATBOT (7 GOUDEN W'S)
          ========================================================================= -->
-    <section id="tab-verhoor" class="tab-content hidden space-y-3">
-
-      <!-- Statuskaart van de persoon ter plaatse -->
-      <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div id="bot-avatar-badge" class="w-10 h-10 rounded-full bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-400 text-lg font-bold">
+    <section id="tab-verhoor" class="tab-content hidden space-y-2.5">
+      <div class="bg-slate-900 rounded-xl p-2.5 border border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-300 text-sm">
             👤
           </div>
           <div>
-            <h2 id="bot-character-name" class="text-xs font-bold text-white">Geen actieve casus</h2>
-            <p id="bot-character-role" class="text-[10px] text-amber-400 font-semibold uppercase">Ga eerst ter plaatse</p>
+            <h2 id="bot-name-label" class="text-xs font-bold text-white">Geen verhoor actief</h2>
+            <p id="bot-role-label" class="text-[9px] text-amber-400 uppercase font-semibold">Ga eerst ter plaatse</p>
           </div>
         </div>
-
-        <!-- Gouden W teller -->
         <div class="text-right">
-          <div class="text-[10px] text-slate-400">Gouden W's ontdekt:</div>
+          <div class="text-[9px] text-slate-400">Gouden W's:</div>
           <div id="w-counter" class="text-xs font-black text-emerald-400 font-mono">0 / 7</div>
         </div>
       </div>
 
-      <!-- Gouden W Progress Checklist (Kleine chips) -->
-      <div class="flex flex-wrap gap-1 bg-slate-900/50 p-2 rounded-lg border border-slate-800/80 text-[9px] font-bold">
+      <!-- Chips voor Gouden W's -->
+      <div class="flex flex-wrap gap-1 bg-slate-900/60 p-1.5 rounded-lg border border-slate-800 text-[9px] font-bold">
         <span id="chip-wie" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WIE</span>
         <span id="chip-wat" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WAT</span>
         <span id="chip-waar" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WAAR</span>
@@ -199,104 +185,62 @@
         <span id="chip-signalement" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">SIGNALEMENT</span>
       </div>
 
-      <!-- Chat Berichten Venster -->
-      <div id="chat-messages" class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 h-[320px] overflow-y-auto space-y-2.5 text-xs">
+      <!-- Chatbox -->
+      <div id="chat-stream" class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 h-[260px] overflow-y-auto space-y-2 text-xs">
         <div class="text-center py-12 text-slate-500 text-xs">
-          <i class="fa-solid fa-comments text-2xl mb-1.5 block"></i>
-          Druk op de Porto-tab eerst op "Ik ben ter plaatse" om het gesprek met de melder/slachtoffer te starten.
+          Druk op de Porto-tab op <strong>"Ik ben ter plaatse"</strong> om het gesprek te starten.
         </div>
       </div>
 
-      <!-- Snelle Vraagknoppen voor Mobiel (Geen getyp nodig) -->
-      <div class="space-y-1.5">
-        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-          <i class="fa-solid fa-bolt text-amber-400"></i> Stel een gerichte vraag:
-        </div>
-        <div class="flex flex-wrap gap-1.5">
-          <button onclick="askBotQuestion('wie')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] px-2.5 py-1.5 rounded-lg font-medium">
-            👤 Wie bent u?
-          </button>
-          <button onclick="askBotQuestion('wat')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] px-2.5 py-1.5 rounded-lg font-medium">
-            ❓ Wat gebeurde er?
-          </button>
-          <button onclick="askBotQuestion('waar')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] px-2.5 py-1.5 rounded-lg font-medium">
-            📍 Waar precies?
-          </button>
-          <button onclick="askBotQuestion('wanneer')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] px-2.5 py-1.5 rounded-lg font-medium">
-            ⏰ Hoe laat was dit?
-          </button>
-          <button onclick="askBotQuestion('signalement')" class="bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/40 text-blue-300 text-[11px] px-2.5 py-1.5 rounded-lg font-bold">
-            🔍 Hoe zag hij/zij eruit?
-          </button>
-          <button onclick="askBotQuestion('waarmee')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] px-2.5 py-1.5 rounded-lg font-medium">
-            🔪 Wapens of geweld?
-          </button>
-          <button onclick="askBotQuestion('vlucht')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] px-2.5 py-1.5 rounded-lg font-medium">
-            🏃 Vluchtrichting?
-          </button>
-        </div>
+      <!-- Snelle vragen -->
+      <div class="flex flex-wrap gap-1">
+        <button onclick="askBotQuestion('wie')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">👤 Wie?</button>
+        <button onclick="askBotQuestion('wat')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">❓ Wat gebeurde er?</button>
+        <button onclick="askBotQuestion('waar')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">📍 Waar precies?</button>
+        <button onclick="askBotQuestion('wanneer')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">⏰ Wanneer?</button>
+        <button onclick="askBotQuestion('signalement')" class="bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 font-bold text-[11px] px-2 py-1.5 rounded-lg border border-blue-500/40">🔍 Signalement?</button>
+        <button onclick="askBotQuestion('waarmee')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">🔪 Waarmee?</button>
+        <button onclick="askBotQuestion('vlucht')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">🏃 Vluchtrichting?</button>
       </div>
-
-      <!-- Vrij tekstinvoerveld voor chatbot -->
-      <form onsubmit="handleCustomChatSubmit(event)" class="flex gap-1.5 pt-1">
-        <input type="text" id="chat-custom-input" placeholder="Of typ zelf een vraag..." class="flex-grow bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 text-base sm:text-xs">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 rounded-xl text-xs font-bold">
-          <i class="fa-solid fa-paper-plane"></i>
-        </button>
-      </form>
-
     </section>
 
     <!-- =========================================================================
          TAB 3: ASTMA MUTATIE OPSTELLEN
          ========================================================================= -->
     <section id="tab-astma" class="tab-content hidden space-y-3">
-
-      <!-- Feedforward Kaart -->
-      <div class="bg-blue-950/40 rounded-xl p-3 border border-blue-600/40 text-xs space-y-1.5">
-        <h3 class="font-bold text-blue-300 flex items-center gap-1.5 text-[11px]">
-          <i class="fa-solid fa-compass"></i> FEEDFORWARD: SIGNALEMENT IN DE 'T'
-        </h3>
-        <p class="text-[11px] text-slate-300 leading-snug">
-          Verwerk alle Gouden W's en hanteer voor het signalement de vaste volgorde:
-          <span class="text-blue-400 font-semibold block mt-0.5">
-            1. Algemeen (geslacht, leeftijd, lengte) &rarr; 2. Hoofd/haar &rarr; 3. Bovenkleding &rarr; 4. Onderkleding/schoenen &rarr; 5. Bijzonderheden.
-          </span>
-        </p>
+      <div class="bg-blue-950/40 rounded-xl p-2.5 border border-blue-600/40 text-xs">
+        <span class="font-bold text-blue-300 block mb-0.5"><i class="fa-solid fa-compass"></i> FEEDFORWARD SIGNALEMENT:</span>
+        <span class="text-slate-300 text-[11px]">
+          Zet het signalement in de <strong>'T'</strong> van boven naar beneden: Geslacht &rarr; Leeftijd/Lengte &rarr; Hoofd/Haar &rarr; Bovenkleding &rarr; Broek &rarr; Schoenen &rarr; Bijzonderheden.
+        </span>
       </div>
 
-      <!-- Formulier -->
-      <form id="astma-form" onsubmit="submitAstmaMutation(event)" class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+      <form id="astma-form" onsubmit="handleMutationSubmit(event)" class="bg-slate-900 rounded-2xl p-3.5 border border-slate-800 space-y-2">
         <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-1">A - Aanleiding (Meldkamerverzoek via porto):</label>
-          <input type="text" id="form-a" required placeholder="Op verzoek van OC ter plaatse gegaan ivm..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-blue-500 text-base sm:text-xs">
+          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">A - Aanleiding (Porto-melding OC):</label>
+          <input type="text" id="input-a" required placeholder="Op verzoek van OC ter plaatse gegaan ivm..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">S - Situatie (Wat trof je aan op locatie?):</label>
+          <input type="text" id="input-s" required placeholder="Aldaar troffen wij melder/slachtoffer aan..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-amber-300 mb-0.5">T - Toedracht / Treffen (Gouden W's + Volledig Signalement):</label>
+          <textarea id="input-t" rows="4" required placeholder="Verhoor / Toedracht en het complete signalement van boven naar beneden..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono text-base sm:text-xs"></textarea>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">M - Maatregel:</label>
+          <input type="text" id="input-m" required placeholder="Getuige gehoord, camerabeelden veiliggesteld..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">A - Afhandeling:</label>
+          <input type="text" id="input-afh" required placeholder="Slachtoffer opgevangen, mutatie opgemaakt..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
         </div>
 
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-1">S - Situatie (Wat trof je aan op de aangewezen etage?):</label>
-          <input type="text" id="form-s" required placeholder="Aldaar troffen wij melder die verklaarde dat..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-blue-500 text-base sm:text-xs">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-amber-300 mb-1">T - Toedracht / Treffen (Gouden W's + Volledig Signalement):</label>
-          <textarea id="form-t" rows="5" required placeholder="Toedracht: Uit het verhoor bleek... Signalement van boven naar beneden: Geslacht, leeftijd, lengte, kleding, bijzonderheden..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 text-base sm:text-xs leading-relaxed"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-1">M - Maatregel:</label>
-          <input type="text" id="form-m" required placeholder="Getuige gehoord, camerabeelden veiliggesteld..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-blue-500 text-base sm:text-xs">
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-1">A - Afhandeling:</label>
-          <input type="text" id="form-afh" required placeholder="Betrokkene gerustgesteld, mutatie ter info..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-blue-500 text-base sm:text-xs">
-        </div>
-
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition pt-2.5">
-          <i class="fa-solid fa-paper-plane"></i> Mutatie Opslaan & Rollen Wisselen
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
+          <i class="fa-solid fa-paper-plane"></i> Mutatie Indienen & Rollen Wisselen
         </button>
       </form>
-
     </section>
 
     <!-- =========================================================================
@@ -304,87 +248,75 @@
          ========================================================================= -->
     <section id="tab-feed" class="tab-content hidden space-y-3">
       <div class="flex items-center justify-between">
-        <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-          <i class="fa-solid fa-tower-broadcast text-emerald-400"></i> Klas Livefeed
-        </h2>
-        <span id="feed-count-badge" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold">0 ingediend</span>
+        <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Mutaties van de klas</h2>
+        <span id="feed-count" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold">0 ingediend</span>
       </div>
-
-      <div id="livefeed-list" class="space-y-3">
-        <!-- Dynamische mutaties uit Firebase -->
-      </div>
+      <div id="feed-list" class="space-y-3"></div>
     </section>
 
   </main>
 
-  <!-- PEER-FEEDBACK MODAL (MOBIELE DIALOG) -->
+  <!-- PEER-FEEDBACK MODAL -->
   <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-4 space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-4 space-y-2.5 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-          <i class="fa-solid fa-comments text-blue-400"></i> Peer-Feedback op ASTMA
-        </h3>
+        <h3 class="text-xs font-bold text-white"><i class="fa-solid fa-comments text-blue-400 mr-1"></i> Peer-Feedback</h3>
         <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div id="modal-mutation-preview" class="bg-slate-950 p-2.5 rounded-xl text-[11px] text-slate-300 font-mono border border-slate-800 max-h-24 overflow-y-auto">
-        <!-- Preview -->
-      </div>
+      <div id="feedback-preview-text" class="bg-slate-950 p-2.5 rounded-xl text-[11px] text-slate-300 font-mono border border-slate-800 max-h-24 overflow-y-auto"></div>
 
-      <form onsubmit="submitPeerFeedback(event)" class="space-y-2.5 text-xs">
+      <form onsubmit="handlePeerFeedbackSubmit(event)" class="space-y-2 text-xs">
         <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-1">Signalement volgorde (Boven &rarr; Beneden):</label>
-          <select id="fb-score-sig" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white">
-            <option value="✅ Uitstekend (Volledig van hoofd naar voeten)">✅ Uitstekend (Volledig van hoofd naar voeten)</option>
-            <option value="⚠️ Redelijk (Klopt grotendeels, mist enkele details)">⚠️ Redelijk (Klopt grotendeels, mist details)</option>
-            <option value="❌ Onvoldoende (Volgorde springt door elkaar)">❌ Onvoldoende (Volgorde springt door elkaar)</option>
+          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">Volgorde signalement:</label>
+          <select id="fb-sig-score" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white">
+            <option value="✅ Uitstekend (Volledig van hoofd naar voeten)">✅ Uitstekend (Van hoofd naar voeten)</option>
+            <option value="⚠️ Matig (Mist onderdelen of volgorde klopt niet)">⚠️ Matig (Mist onderdelen)</option>
+            <option value="❌ Onvoldoende (Volgorde door elkaar)">❌ Onvoldoende (Door elkaar)</option>
           </select>
         </div>
-
         <div>
-          <label class="block text-[11px] font-bold text-emerald-400 mb-1">TOP (Wat deed de student sterk?):</label>
-          <input type="text" id="fb-input-top" required placeholder="Bijv.: Signalement erg nauwkeurig beschreven..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+          <label class="block text-[11px] font-bold text-emerald-400 mb-0.5">TOP:</label>
+          <input type="text" id="fb-top-text" required placeholder="Wat was goed?" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
         </div>
-
         <div>
-          <label class="block text-[11px] font-bold text-amber-400 mb-1">TIP (Wat kan de volgende keer beter?):</label>
-          <input type="text" id="fb-input-tip" required placeholder="Bijv.: Vergeet de vluchtrichting niet in de T..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+          <label class="block text-[11px] font-bold text-amber-400 mb-0.5">TIP:</label>
+          <input type="text" id="fb-tip-text" required placeholder="Wat kan er beter?" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
         </div>
-
         <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-          <button type="button" onclick="closeFeedbackModal()" class="px-3 py-2 rounded-xl bg-slate-800 text-xs font-semibold">Annuleren</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white">Opslaan</button>
+          <button type="button" onclick="closeFeedbackModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 text-xs">Annuleren</button>
+          <button type="submit" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white">Opslaan</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MOBIELE BOTTOM APP BAR (STICKY NAVIGATIE) -->
-  <nav class="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 z-40 px-2 py-1.5 flex justify-around">
-    <button onclick="switchTab('porto')" id="nav-btn-porto" class="flex flex-col items-center py-1 px-3 rounded-xl text-blue-400 font-bold transition">
+  <!-- VASTE NAVIGATIE ONDERAAN -->
+  <nav class="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 z-40 px-2 py-1 flex justify-around">
+    <button onclick="navigateToTab('porto')" id="nav-porto" class="flex flex-col items-center py-1 px-3 rounded-xl text-blue-400 font-bold transition">
       <i class="fa-solid fa-walkie-talkie text-base"></i>
       <span class="text-[10px] mt-0.5">Porto</span>
     </button>
-    <button onclick="switchTab('verhoor')" id="nav-btn-verhoor" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition relative">
+    <button onclick="navigateToTab('verhoor')" id="nav-verhoor" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition relative">
       <i class="fa-solid fa-comments text-base"></i>
       <span class="text-[10px] mt-0.5">Verhoor</span>
-      <span id="nav-badge-chat" class="w-2 h-2 rounded-full bg-emerald-400 absolute top-1 right-3 hidden"></span>
+      <span id="chat-notification-dot" class="w-2 h-2 rounded-full bg-emerald-400 absolute top-1 right-3 hidden"></span>
     </button>
-    <button onclick="switchTab('astma')" id="nav-btn-astma" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition">
+    <button onclick="navigateToTab('astma')" id="nav-astma" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition">
       <i class="fa-solid fa-pen-to-square text-base"></i>
       <span class="text-[10px] mt-0.5">ASTMA</span>
     </button>
-    <button onclick="switchTab('feed')" id="nav-btn-feed" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition">
+    <button onclick="navigateToTab('feed')" id="nav-feed" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition">
       <i class="fa-solid fa-tower-broadcast text-base"></i>
       <span class="text-[10px] mt-0.5">Feed</span>
     </button>
   </nav>
 
-  <!-- =========================================================================
-       LOGICA: FIREBASE, AUDIO, 15 CHATBOT CASUSSEN & GOUDEN W'S
-       ========================================================================= -->
+  <!-- JAVASCRIPT MOTOR -->
   <script>
-    /* 1. FIREBASE INITIALISATIE MET JOUW SPECIFIEKE CONFIG */
+    /* =========================================================================
+       1. FIREBASE CONFIGURATIE (JOUW EIGEN DATABASE)
+       ========================================================================= */
     const firebaseConfig = {
       apiKey: "AIzaSyBj8dXkl1rEfyx54_MDy_tYd2P7kAeU8VQ",
       authDomain: "q2les3samirgem.firebaseapp.com",
@@ -395,23 +327,13 @@
       appId: "1:8681998187:web:fd08067494a010dc572e2e"
     };
 
-    let database = null;
-    let useFirebase = false;
-
-    try {
-      firebase.initializeApp(firebaseConfig);
-      database = firebase.database();
-      useFirebase = true;
-      console.log("Firebase RTDB verbonden met q2les3samirgem");
-    } catch(err) {
-      console.error("Firebase fout, switch naar lokale modus:", err);
-      useFirebase = false;
-    }
-
-    const broadcast = ('BroadcastChannel' in window) ? new BroadcastChannel('mutatieles_porto_bus') : null;
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
     const DB_ROOT = 'mutatieles5';
 
-    /* 2. LOCATIES & 15 INTERACTIEVE CASUSSEN MET GOUDEN W'S EN CHATBOT RESPONSE */
+    /* =========================================================================
+       2. LOCATIES & 15 CASUSSEN MET GOUDEN W'S
+       ========================================================================= */
     const LOCATIONS = [
       { id: 'a', name: 'Onderwijsondersteuning (3e etage)' },
       { id: 'b', name: 'Receptie (begane grond)' },
@@ -427,329 +349,461 @@
         locatie: LOCATIONS[2],
         personage: "Milan de Vries",
         rol: "Slachtoffer",
-        greeting: "Goed dat jullie er zijn agent! Ik stond net bij de balie en opeens was mijn portemonnee uit mijn tas verdwenen!",
+        greeting: "Agent, gelukkig ben je er! Mijn portemonnee is zojuist uit mijn rugzak geritst bij de balie!",
         answers: {
-          wie: "Ik ben Milan de Vries, 2e jaars student. De dader was een onbekende jongeman die net deed alsof hij een foldertje pakte.",
-          wat: "Mijn portemonnee met €60 contant, mijn pinpas en mijn studentenkaart zijn gestolen uit mijn rugzak.",
-          waar: "Hier bij de balie op de 2e etage, vlak voor de glazen liften.",
-          wanneer: "Ongeveer 7 minuten geleden, rond kwart over tien.",
-          waarmee: "Geen wapens gezien, het was een hele snelle en behendige zakkenroller.",
-          hoe: "Hij botste tegen me aan met een excuus en ritste ondertussen met één beweging mijn zijvak open.",
-          signalement: "Man, ca. 20-25 jaar, ca. 1.85m lang, slank postuur, lichte huidskleur, kort donkerblond opgeschoren haar. Zwarte The North Face jas over een grijze hoodie. Donkerblauwe spijkerbroek met scheurtjes op de knie. Witte Nike Air Max met zwarte swoosh. Zwarte schoudertas om zijn borst en Amsterdams accent!",
-          vlucht: "Hij sprintte meteen de noodtrap af richting de uitgang begane grond!"
+          wie: "Ik ben Milan de Vries. De dader leek een student die vlak achter me stond.",
+          wat: "Zakkenrollerij van mijn zwarte lederen portemonnee met €60 en pasjes.",
+          waar: "Bij de balie op de 2e etage, vlakbij de glazen liften.",
+          wanneer: "Ongeveer 5 minuten geleden.",
+          waarmee: "Geen wapen gezien, heel geruisloos en sneaky.",
+          hoe: "Hij botste tegen me op en ritste ondertussen behendig mijn tas open.",
+          signalement: "Man, ca. 20-25 jaar, ca. 1.85m lang, slank postuur, lichte huidskleur, kort donkerblond opgeschoren haar. Zwarte The North Face jas over grijze hoodie. Donkerblauwe spijkerbroek. Witte Nike Air Max met zwarte swoosh. Zwarte schoudertas om zijn torso en Amsterdams accent!",
+          vlucht: "Hij rende meteen de noodtrap af richting de uitgang!"
         }
       },
       {
         id: 2,
-        titel: "Verdachte situatie bij lockers",
+        titel: "Verdachte situatie kluisjes",
         locatie: LOCATIONS[1],
         personage: "Henk (Beveiliger)",
         rol: "Melder",
-        greeting: "Hoi collega's! Ik zag op de camera's dat een vrouw met een schroevendraaier aan de kluisjes stond te trekken.",
+        greeting: "Collega's! Ik zag een vrouw met een schroevendraaier aan de kluisjes trekken.",
         answers: {
-          wie: "Ik ben Henk, beveiliger van dienst. De verdachte is een vrouw die hier vaker rondhangt maar geen student is.",
-          wat: "Poging tot openbreken van minimaal drie kluisjes met braakschade tot gevolg.",
-          waar: "Bij de kluisjeswand direct tegenover de receptie op de begane grond.",
-          wanneer: "Zo'n 10 minuten geleden. Ik zag het live op de monitor.",
-          waarmee: "Ze had een grote gele schroevendraaier en een nijptang in haar handen.",
-          hoe: "Ze wrikte de sloten met kracht open tot het metaal verbogen was.",
-          signalement: "Vrouw, ca. 30-35 jaar, ca. 1.68m lang, stevig postuur, getinte huidskleur, lang zwart haar in een strakke staart. Bordeauxrood bomberjack met oranje voering, wit hemdje. Zwarte lederlook legging. Hoge zwarte Dr. Martens laarzen. Zichtbare bloementattoo in haar hals!",
-          vlucht: "Toen ze mij aan zag lopen liep ze snel door de draaideur naar buiten richting de fietsenstalling."
+          wie: "Ik ben beveiliger Henk. De vrouw is een bekende overlastgever.",
+          wat: "Poging tot inbraak in lockers met forse lakschade.",
+          waar: "Bij de kluisjeswand tegenover de receptie op de begane grond.",
+          wanneer: "Net 6 minuten geleden.",
+          waarmee: "Grote gele schroevendraaier en combinatietang.",
+          hoe: "Wrikte sloten open tot de deurtjes bogen.",
+          signalement: "Vrouw, ca. 30-35 jaar, ca. 1.68m lang, stevig postuur, getinte huidskleur, lang zwart haar in een strakke staart. Bordeauxrood bomberjack met oranje binnenkant, wit shirt. Zwarte glimmende legging. Hoge zwarte Dr. Martens kisten. Opvallende bloementattoo in haar hals!",
+          vlucht: "Liep snel door de draaideur naar buiten richting de fietsenrekken."
         }
       },
       {
         id: 3,
-        titel: "Aantreffen verward en agressief persoon",
+        titel: "Verward persoon gooit tafels om",
         locatie: LOCATIONS[4],
         personage: "Sophie (Getuige)",
         rol: "Getuige",
-        greeting: "Help alsjeblieft! Er liep hier net een man keihard te schreeuwen en hij gooide een hele stapel boeken en stoelen om!",
+        greeting: "Help! Een man schreeuwt hier heel hard en heeft zojuist tafels en stoelen omgegooid!",
         answers: {
-          wie: "Ik ben Sophie, ik zat rustig te studeren. De man leek totaal in de war en riep dat iedereen hem afluisterde.",
-          wat: "Verstoring van de openbare orde, vernieling van studiemeubilair en bedreiging van studenten.",
-          waar: "Ronde studieruimte, 4e etage, bij de grote leestafels aan het raam.",
-          wanneer: "Net 3 minuten geleden, hij is zojuist weggelopen.",
-          waarmee: "Hij zwaaide dreigend met een zware metalen thermosfles.",
-          hoe: "Hij schopte tegen stoelen, schold naar iedereen en sloeg keihard op de tafels.",
-          signalement: "Man, 40-45 jaar, ca. 1.75m, mager pezig postuur, bleke huidskleur. Warrig grijs-bruin halflang haar, stoppelig baardje. Vieze kakigroene parka jas zonder capuchon. Verwassen blauwe joggingbroek vol vlekken. Bruine sandalen met blauwe sokken. Litteken boven zijn rechteroog!",
-          vlucht: "Hij liep mompelend richting de toiletten aan het einde van de gang."
+          wie: "Ik ben Sophie (studente). De man leek totaal verward en praat tegen zichzelf.",
+          wat: "Verstoring openbare orde en vernieling van schoolmeubilair.",
+          waar: "In de ronde studieruimte op de 4e etage aan het raam.",
+          wanneer: "Ongeveer 3 minuten geleden.",
+          waarmee: "Hij zwaaide met een zware metalen thermosfles.",
+          hoe: "Schopte meubels omver en schold luidkeels naar voorbijgangers.",
+          signalement: "Man, 40-45 jaar, ca. 1.75m, mager pezig postuur, bleke huidskleur. Warrig grijs-bruin halflang haar, stoppelbaard. Vieze kakigroene parka jas. Blauwe versleten joggingbroek. Bruine sandalen met blauwe sokken. Litteken boven het rechteroog!",
+          vlucht: "Liep mompelend naar de toiletten aan het einde van de gang."
         }
       },
       {
         id: 4,
-        titel: "Lokaalvredebreuk docentenafdeling",
+        titel: "Geschorste student bij docentenkamers",
         locatie: LOCATIONS[3],
         personage: "Peter (Docent)",
         rol: "Melder",
-        greeting: "Collega's, kom snel! Een geschorste student bonkt hier woedend op de deuren en weigert het pand te verlaten.",
+        greeting: "Agenten, fijn dat jullie er zijn! Een geschorste student bonkt agressief op de klapdeuren.",
         answers: {
-          wie: "Ik ben docent Peter Jansen. De jongen is vorig blok geschorst wegens wangedrag.",
-          wat: "Lokaalvredebreuk en verbale bedreiging van het docentencorps.",
-          waar: "5e etage, direct voor de klapdeuren naar de docentenkamers.",
-          wanneer: "Het speelt nu al zo'n 15 minuten, hij blijft maar terugkomen.",
-          waarmee: "Geen fysieke wapens, maar hij dreigde docenten buiten 'op te wachten'.",
-          hoe: "Hij probeert door de gesloten elektronische deuren heen te beuken.",
-          signalement: "Man, 19-22 jaar, ca. 1.90m, atletisch gespierd postuur, lichtgetint. Zwart kort kroeshaar met strakke scheiding links, klein verzorgd sikje. Felgele regenjas met zwarte rits, daaronder zwart trainingsjack. Zwarte Nike Tech Fleece joggingbroek. Zwarte hardloopschoenen. Dikke gouden ketting om de nek!",
-          vlucht: "Toen hij jullie porto hoorde, dook hij de brandtrap in richting het dak."
+          wie: "Ik ben docent Peter Jansen. De jongeman is vorig blok weggestuurd.",
+          wat: "Lokaalvredebreuk en verbale bedreiging van collega's.",
+          waar: "5e etage, direct voor de klapdeuren van de docentenafdeling.",
+          wanneer: "Het duurt nu al een kwartier.",
+          waarmee: "Geen wapens, maar dreigde ons na werktijd buiten op te wachten.",
+          hoe: "Beukt hard tegen het glas van de elektronische deuren.",
+          signalement: "Man, 19-22 jaar, ca. 1.90m, atletisch postuur, lichtgetint uiterlijk. Zwart kort kroeshaar met strakke scheiding links, klein verzorgd sikje. Felgele regenjas met zwarte rits over een zwart jack. Zwarte Nike Tech broek. Zwarte hardloopschoenen. Dikke gouden ketting om de hals!",
+          vlucht: "Vluchtte de brandtrap in toen hij jullie porto hoorde."
         }
       },
       {
         id: 5,
-        titel: "Diefstal laptops uit werkruimte",
+        titel: "Diefstal laptops werkruimte",
         locatie: LOCATIONS[0],
         personage: "Saskia (Medewerkster)",
         rol: "Melder",
-        greeting: "O jee, wat vreselijk! Ik kwam terug van de koffieautomaat en zag iemand wegrennen met twee dienstlaptops onder de arm!",
+        greeting: "Wat een schrik! Iemand heeft zojuist twee laptops uit ons kantoor gestolen!",
         answers: {
-          wie: "Ik ben Saskia van der Wal, onderwijsassistent. De dader deed zich voor als schoonmaakster.",
-          wat: "Diefstal van 2 HP laptops van de school ter waarde van zo'n €1800,-.",
-          waar: "Kantoor Onderwijsondersteuning, kamer 3.14 op de 3e etage.",
-          wanneer: "Exact 5 minuten geleden toen ik naar het toilet was.",
-          waarmee: "Geen geweld, de kantoordeur stond op een kier.",
-          hoe: "Snel naar binnen geglipt, laptops van het docking station gerukt en in een tas gestopt.",
-          signalement: "Vrouw, ca. 25-28 jaar oud, ca. 1.72m lang, tenger postuur, lichte huid met sproeten. Koperrood steil schouderlang haar, ronde gouden bril. Beige halflange trenchcoat over een donkergroene trui. Donkerblauwe pantalon met bruine suède enkellaarsjes. Droeg een grote blauwe IKEA-tas!",
-          vlucht: "Rende richting de hoofdlift op de 3e etage."
+          wie: "Ik ben Saskia van Onderwijsondersteuning. Dader deed zich voor als bezoeker.",
+          wat: "Diefstal van 2 zilveren HP laptops ter waarde van €1800,-.",
+          waar: "Kantoor Onderwijsondersteuning op de 3e etage.",
+          wanneer: "Ongeveer 5 minuten geleden.",
+          waarmee: "Geen wapens, kantoor stond tijdelijk leeg.",
+          hoe: "Kwam rustig binnenlopen, trok de kabels los en stopte ze in een tas.",
+          signalement: "Vrouw, ca. 25-28 jaar, ca. 1.72m lang, tenger postuur, lichte huid met sproeten. Koperrood steil haar tot de schouders, ronde gouden bril. Beige halflange trenchcoat over donkergroene trui. Donkerblauwe pantalon met bruine suède laarsjes. Grote blauwe IKEA-tas!",
+          vlucht: "Rende richting de lift op de 3e etage."
         }
       },
       {
         id: 6,
-        titel: "Agressieve confrontatie bij balie",
+        titel: "Agressie bij de balie",
         locatie: LOCATIONS[2],
-        personage: "Tariq (Baliemedewerker)",
+        personage: "Tariq (Balie)",
         rol: "Melder",
-        greeting: "Fijn dat jullie er zijn! Een bezoeker werd zojuist zó agressief dat we het alarmglas bijna hebben ingedrukt.",
+        greeting: "Hij sloeg bijna de ruit in! Een bezoeker eiste agressief een cijferlijst.",
         answers: {
-          wie: "Ik ben Tariq, servicemedewerker balie. De man wilde zonder afspraak een examen inzien.",
-          wat: "Bedreiging met zware mishandeling en vernieling van de balie-intercom.",
-          waar: "Balie op de 2e etage, direct bij de ontvangstruimte.",
-          wanneer: "Ongeveer 4 minuten geleden.",
-          waarmee: "Hij sloeg met zijn vuisten op de balieruit en gooide een zware presse-papier door de ruimte.",
-          hoe: "Schreeuwen, intimideren en eisen dat 'er bloed zou vloeien'.",
-          signalement: "Man, 35-40 jaar, ca. 1.80m, zwaar gespierd postuur, donkere huidskleur. Kaalgeschoren hoofd, volle zware zwarte baard. Zwart mouwloos sporthemd (tatoeages over beide armen zichtbaar). Grijze cargobroek met grote zakken. Zware zwarte werkschoenen met stalen neus. Litteken over linkerwang!",
-          vlucht: "Liep briesend naar beneden via de brede trap."
+          wie: "Ik ben Tariq van de balie. De man weigerde zich te legitimeren.",
+          wat: "Bedreiging met zware mishandeling en vernieling van apparatuur.",
+          waar: "Balie op de 2e etage.",
+          wanneer: "Net 4 minuten geleden gebeurd.",
+          waarmee: "Sloeg met vuisten op de balie en gooide een presse-papier.",
+          hoe: "Schreeuwen, intimideren en dreigen dat hij buiten op ons zou wachten.",
+          signalement: "Man, 35-40 jaar, ca. 1.80m, zwaar gespierd postuur, donkere huidskleur. Kaalgeschoren hoofd, volle zware zwarte baard. Zwart mouwloos sporthemd (tattoos op beide armen). Grijze cargobroek met zijzakken. Zware zwarte werkschoenen met stalen neus. Litteken over linkerwang!",
+          vlucht: "Liep briesend via de trap naar beneden."
         }
       },
       {
         id: 7,
-        titel: "Graffiti en vernieling klapdeuren",
+        titel: "Graffiti op afdelingsdeur",
         locatie: LOCATIONS[3],
         personage: "Fatima (Schoonmaak)",
         rol: "Melder",
-        greeting: "Kijk eens wat een bende! Iemand heeft zojuist met zilveren spuitbussen de hele muur en display volgespoten!",
+        greeting: "Kijk eens wat een verfschade! Een jongen spoot zojuist de hele klapdeur onder!",
         answers: {
-          wie: "Ik ben Fatima van de facilitaire dienst. Ik zag een jongen met een capuchon wegrennen.",
-          wat: "Vernieling en bekladding van schoolmeubilair met chemische verf.",
-          waar: "De witte hal voor de klapdeuren van de docentenafdeling, 5e etage.",
-          wanneer: "Twee minuten geleden, de verf is letterlijk nog nat!",
-          waarmee: "Zilveren en zwarte spuitbussen van het merk Montana.",
-          hoe: "Heeft grote letters op het glas en de deuren gespoten en display ingetrapt.",
-          signalement: "Jongeman, 16-20 jaar, ca. 1.70m, normaal postuur, lichte huidskleur. Droeg een zwart mondkapje. Zwarte oversized hoodie strak over zijn hoofd getrokken. Donkere spijkerbroek vol verfvlekken. Zwart-witte Vans skateschoenen. Droeg een zwarte Eastpak rugzak waar rammelende bussen in zaten!",
-          vlucht: "Via de noodtrap 5e etage naar beneden gevlucht."
+          wie: "Ik ben Fatima. Ik betrapte de dader op heterdaad.",
+          wat: "Vernieling met chemische zilveren graffiti op de deuren.",
+          waar: "Hal voor de klapdeuren docentenafdeling, 5e etage.",
+          wanneer: "Twee minuten geleden, de verf is nog nat!",
+          waarmee: "Zilveren en zwarte spuitbussen van Montana.",
+          hoe: "Snel tags gespoten en display ingetrapt.",
+          signalement: "Jongeman, 16-20 jaar, ca. 1.70m, normaal postuur, lichte huidskleur. Zwart mondkapje op. Zwarte oversized hoodie strak over zijn hoofd. Donkere jeans vol verfvlekken. Zwart-witte Vans skateschoenen. Droeg een zwarte rugzak waarin verfbussen rammelden!",
+          vlucht: "Via de noodtrap 5e etage naar beneden gerend."
         }
       },
       {
         id: 8,
-        titel: "Onbevoegde betreding ICT-ruimte",
+        titel: "Valse monteur in ICT-ruimte",
         locatie: LOCATIONS[0],
-        personage: "Peter (Systeembeheer)",
+        personage: "Peter (ICT)",
         rol: "Melder",
-        greeting: "Agent, goed dat je er bent! Ik betrapte zojuist een man die in onze centrale serverkast stond te graven.",
+        greeting: "Agenten, ik trof zojuist een man aan die aan onze centrale serverkast zat!",
         answers: {
-          wie: "Ik ben Peter, netwerkbeheerder. De man beweerde een KPN-monteur te zijn, maar had geen werkorder.",
-          wat: "Huisvredebreuk en mogelijke poging tot datadiefstal of sabotage van het schoolnetwerk.",
-          waar: "Serverruimte grenzend aan Onderwijsondersteuning, 3e etage.",
-          wanneer: "Ongeveer 10 minuten geleden.",
-          waarmee: "Hij had een USB-stick in een hoofdschakelaar zitten en gereedschap bij zich.",
-          hoe: "Heeft waarschijnlijk met een gemanipuleerde pas de cijfercode omzeild.",
-          signalement: "Man, 45-50 jaar oud, ca. 1.78m, normaal postuur met buikje, lichte huidskleur. Grijs kort haar netjes gekamd met scheiding, gladgeschoren. Donkerblauwe polo met wit boordje, donkerblauwe bodywarmer. Donkergrijze werkbroek met zwarte nette veiligheidsschoenen. Had een geel keycord zonder pas om!",
-          vlucht: "Liep snel weg toen ik om zijn legitimatie vroeg richting noordelijke uitgang."
+          wie: "Ik ben Peter, netwerkbeheerder. De man had geen werkbon.",
+          wat: "Huisvredebreuk en mogelijke poging tot datadiefstal.",
+          waar: "Serverkast bij Onderwijsondersteuning, 3e etage.",
+          wanneer: "Circa 8 minuten geleden.",
+          waarmee: "Had gereedschap en een verdachte USB-stick bij zich.",
+          hoe: "Had vermoedelijk een loperpas bemachtigd om binnen te komen.",
+          signalement: "Man, 45-50 jaar, ca. 1.78m, normaal postuur met buikje, lichte huid. Kort grijs haar netjes met scheiding, gladgeschoren. Donkerblauwe polo, donkerblauwe bodywarmer. Donkergrijze werkbroek met zwarte veiligheidsschoenen. Geel keycord zonder pasje!",
+          vlucht: "Liep snel weg richting nooduitgang noord."
         }
       },
       {
         id: 9,
-        titel: "Belaging en intimidatie in studieruimte",
+        titel: "Belaging en stiekem filmen",
         locatie: LOCATIONS[4],
         personage: "Eline (Studente)",
         rol: "Slachtoffer",
-        greeting: "Help me alsjeblieft, ik ben zo bang... Een man heeft me al meer dan een uur stiekem zitten filmen en volgde me overal.",
+        greeting: "Help me alsjeblieft... Een man filmt me al een uur en spreekt me dreigend aan.",
         answers: {
-          wie: "Ik ben Eline. Die man zat de hele tijd achter me en maakte stiekem close-up foto's met zijn telefoon.",
+          wie: "Ik ben Eline. De man bleef me maar volgen tussen de studieplekken.",
           wat: "Belaging (stalking) en ernstige inbreuk op privacy.",
-          waar: "In de ronde studieruimte, 4e etage, bij de computerhoek.",
-          wanneer: "Het gebeurt al de hele ochtend, maar net sprak hij me dreigend aan.",
-          waarmee: "Hij filmde me met een iPhone in een opvallend felroze hoesje.",
-          hoe: "Hij kwam heel dichtbij zitten, fluisterde nare dingen en weigerde weg te gaan.",
-          signalement: "Man, ca. 26-30 jaar oud, ca. 1.82m, tenger slank postuur, Oost-Aziatisch uiterlijk. Zwart sluik haar met middenscheiding tot op de oren. Olijfgroen bomberjack over wit T-shirt met rode print. Zwarte enkellange broek (cropped pantalon). Witte sneakers met hoge witte sokken. Zilveren zonnebril bovenop zijn hoofd!",
-          vlucht: "Toen ik begon te huilen liep hij snel de studieruimte uit richting de liften."
+          waar: "Ronde studieruimte, 4e etage.",
+          wanneer: "Gebeurt al de hele ochtend, net escaleerde het.",
+          waarmee: "Hij filmde me met een iPhone in een felroze hoesje.",
+          hoe: "Kwam heel dichtbij zitten en fluisterde intimiderende dingen.",
+          signalement: "Man, 26-30 jaar, ca. 1.82m, tenger slank postuur, Oost-Aziatisch uiterlijk. Zwart sluik haar met scheiding tot op de oren. Olijfgroen bomberjack over wit shirt met rode print. Zwarte enkellange broek. Witte sneakers met hoge sokken. Zilveren zonnebril op zijn hoofd!",
+          vlucht: "Verliet snel de zaal richting de lift."
         }
       },
       {
         id: 10,
-        titel: "Vervalst ID bij uitgifte bezoekerspas",
+        titel: "Vervalst ID bij receptie",
         locatie: LOCATIONS[1],
-        personage: "Sandra (Receptioniste)",
+        personage: "Sandra (Receptie)",
         rol: "Melder",
-        greeting: "Agenten, kijk hier eens naar. Deze man probeerde zojuist met een overduidelijk vals rijbewijs een pas te krijgen.",
+        greeting: "Deze man probeerde zojuist met een vals rijbewijs een bezoekerspas te krijgen!",
         answers: {
-          wie: "Ik ben Sandra van de centrale receptie. De man zei dat hij een afspraak had met de directie.",
-          wat: "Valsheid in geschrifte en poging tot illegale binnendringing van beveiligde zones.",
-          waar: "Hoofdreceptie balie, begane grond bij de ingang.",
-          wanneer: "Letterlijk 6 minuten geleden.",
-          waarmee: "Een vervalst Nederlands rijbewijs waarvan de watermerken en foto overduidelijk geplakt waren.",
-          hoe: "Hij overhandigde het document heel zelfverzekerd, maar begon te trillen toen ik het onder de UV-lamp hield.",
-          signalement: "Man, 28-32 jaar, ca. 1.86m lang, fors postuur, olijfkleurige/mediterrane tint. Zwart golvend haar strak achterover met gel, zware wenkbrauwen, nette ringbaard. Zwart lederen jack met zilveren ritsen, bordeauxrood T-shirt. Donkergrijze jeans. Zwarte leren schoenen. Groot zilverkleurig horloge om linkerpols!",
-          vlucht: "Hij griste het valse pasje terug en rende direct naar het buitenterrein."
+          wie: "Ik ben Sandra van de balie. De man deed zich voor als inspecteur.",
+          wat: "Valsheid in geschrifte en poging tot onbevoegde toegang.",
+          waar: "Receptie op de begane grond.",
+          wanneer: "Ongeveer 5 minuten geleden.",
+          waarmee: "Een overduidelijk vervalst plastic rijbewijs.",
+          hoe: "Overhandigde het document, maar raakte in paniek toen ik de UV-lamp pakte.",
+          signalement: "Man, 28-32 jaar, ca. 1.86m, fors postuur, mediterrane herkomst. Zwart achterovergekamd haar met gel, nette ringbaard. Zwart lederen motorjack, bordeauxrood T-shirt. Donkergrijze spijkerbroek met zwarte leren schoenen. Opvallend groot zilveren horloge om de linkerpols!",
+          vlucht: "Griste zijn pas terug en rende direct het plein op."
         }
       },
       {
         id: 11,
-        titel: "Achtergelaten verdachte sporttas",
+        titel: "Achtergelaten sporttas bij plantenbak",
         locatie: LOCATIONS[1],
         personage: "Kees (Conciërge)",
         rol: "Melder",
-        greeting: "Mooi dat jullie er zijn! Een gast zette hier net een joekel van een sporttas neer en rende letterlijk weg!",
+        greeting: "Collega's! Een gast zette hier net een joekel van een tas neer en rende weg!",
         answers: {
-          wie: "Ik ben Kees, conciërge. Een jonge gozer zette die tas neer achter de plantenbak.",
-          wat: "Verdacht pakket / mogelijke dreiging of illegale goederen.",
-          waar: "Begane grond, receptiehal naast de grote ficus plant.",
-          wanneer: "Ongeveer 3 minuten geleden. We hebben de hal al deels ontruimd.",
-          waarmee: "Een zware zwarte stoffen sporttas met gele letters 'GYM PRO'.",
-          hoe: "Zette hem haastig neer, keek schichtig om zich heen en zette het op een lopen.",
-          signalement: "Man, 22-26 jaar oud, ca. 1.76m, atletisch postuur, donkere huidskleur. Gemillimeterd zwart haar. Fel oranje reflecterend veiligheidshesje over een donkerblauwe hoodie. Zwarte joggingbroek met witte bies. Felrode Air Jordan sneakers. Had zwarte werkhandschoenen zonder vingers aan!",
-          vlucht: "Sprintte naar buiten richting de hoofdweg en bushalte."
+          wie: "Ik ben Kees, conciërge. Een jonge man dumpte de tas haastig.",
+          wat: "Verdacht pakket / mogelijke gevaarlijke stoffen.",
+          waar: "Receptie begane grond, achter de grote ficus plant.",
+          wanneer: "Net 3 minuten geleden.",
+          waarmee: "Grote zwarte stoffen tas met opdruk 'GYM PRO'.",
+          hoe: "Zette hem neer, keek schichtig rond en zette het op een lopen.",
+          signalement: "Man, 22-26 jaar, ca. 1.76m, atletisch postuur, donkere huidskleur. Gemillimeterd zwart haar. Fel oranje reflecterend hesje over donkerblauwe hoodie. Zwarte joggingbroek met witte bies. Felrode basketbalschoenen (Jordans). Zwarte vingerloze werkhandschoenen!",
+          vlucht: "Rende via de hoofduitgang naar de bushalte."
         }
       },
       {
         id: 12,
-        titel: "Gewonde straatroof-slachtoffer vlucht naar binnen",
+        titel: "Slachtoffer straatroof zoekt hulp",
         locatie: LOCATIONS[2],
         personage: "Thomas (Slachtoffer)",
         rol: "Slachtoffer",
-        greeting: "Help me alsjeblieft... Ik ben zojuist buiten bij het metrostation bedreigd met een mes en naar binnen gevlucht!",
+        greeting: "Help me... Ik ben buiten bij de halte bedreigd met een mes en hierheen gevlucht!",
         answers: {
-          wie: "Ik ben Thomas (19 jaar). De dader trok buiten een mes en eiste mijn jas en telefoon.",
-          wat: "Straatroof met bedreiging van een steekwapen en lichte verwonding aan de hand.",
-          waar: "Het begon bij het metroviaduct, maar ik ben hier naar de balie op de 2e etage gerend.",
-          wanneer: "Nog geen 8 minuten geleden.",
-          waarmee: "Een zilverkleurig inklapbaar zakmes met een kartelrand.",
-          hoe: "Hij zette het mes op mijn borst, duwde me tegen het hek en sneed in mijn hand toen ik afweerde.",
-          signalement: "Jongen, ca. 18-20 jaar, ca. 1.75m, mager postuur, lichtgetint. Zwarte krullen die onder een zwarte vissershoed (bucket hat) uitkwamen. Donkerblauwe donsjas Trapstar met witte letters. Grijze joggingbroek hangend onder zijn middel. Zwarte sneakers. Sprak straattaal met hese stem!",
-          vlucht: "Hij rende weg richting het parkje naast de school."
+          wie: "Ik ben Thomas (19). De overvaller eiste mijn telefoon en jas.",
+          wat: "Straatroof onder bedreiging met een steekwapen.",
+          waar: "Gebeurde buiten, maar ik ben naar de balie op de 2e etage gerend.",
+          wanneer: "Ongeveer 7 minuten geleden.",
+          waarmee: "Een inklapbaar zilveren zakmes met kartels.",
+          hoe: "Zette het mes op mijn borst en sneed me licht in mijn hand.",
+          signalement: "Jongen, ca. 18-20 jaar, ca. 1.75m, mager postuur, lichtgetint. Zwarte krullen onder een zwarte bucket hat. Donkerblauwe Trapstar donsjas met witte letters. Grijze joggingbroek laag op de heupen. Zwarte sportschoenen. Sprak straattaal met een hese stem!",
+          vlucht: "Rende weg richting het parkje."
         }
       },
       {
         id: 13,
-        titel: "Docent bedreigd na uitslaggesprek",
+        titel: "Bedreiging docent in spreekkamer",
         locatie: LOCATIONS[3],
         personage: "Janine (Docent)",
         rol: "Melder",
-        greeting: "Agenten, ik ben nog helemaal ontdaan. Een cursiste heeft me zojuist ernstig verbaal bedreigd in de spreekkamer.",
+        greeting: "Ik ben hevig geschrokken. Een cursiste heeft me zojuist ernstig bedreigd.",
         answers: {
-          wie: "Ik ben Janine, examinator. De cursiste zakte voor haar herexamen en werd ziedend.",
-          wat: "Bedreiging tegen een ambtenaar/onderwijzer in functie.",
-          waar: "Spreekkamer 5.08, bij de klapdeuren van de 5e etage.",
-          wanneer: "Ongeveer 10 minuten geleden.",
-          waarmee: "Geen wapens, maar ze schreeuwde dat ze mijn auto in brand zou steken en me thuis zou opzoeken.",
-          hoe: "Kwam centimeters voor mijn gezicht staan, wees met haar vinger en spuugde op mijn bureau.",
-          signalement: "Vrouw, 22-25 jaar, ca. 1.65m, slank postuur, lichte huidskleur. Lang steil blond haar tot het midden van haar rug, opvallende felrode lippenstift. Zwarte coltrui onder een geruite blazer. Zwarte kokerrok tot de knie. Hoge zwarte suède laarzen met naaldhakken. Meerdere zilveren ringen en een tatoeage van een vogel op de pols!",
-          vlucht: "Stormde woedend de klapdeuren door richting de trap."
+          wie: "Ik ben Janine, examinator. De cursiste zakte voor haar herexamen.",
+          wat: "Bedreiging van een functionaris in functie.",
+          waar: "Spreekkamer 5.08, bij de klapdeuren 5e etage.",
+          wanneer: "Zo'n 10 minuten geleden.",
+          waarmee: "Geen fysiek wapen, maar dreigde mijn auto in brand te steken.",
+          hoe: "Kwam dreigend voor me staan, wees met vinger en spuugde op mijn bureau.",
+          signalement: "Vrouw, 22-25 jaar, ca. 1.65m, slank postuur, lichte huid. Lang steil blond haar tot midden op de rug, felrode lippenstift. Zwarte coltrui onder geruite blazer. Zwarte kokerrok met kniehoge suède laarzen. Veel zilveren ringen en vogel-tatoeage op linkerpols!",
+          vlucht: "Stormde woedend door de klapdeuren richting de trap."
         }
       },
       {
         id: 14,
-        titel: "Inbraak via de brandtrap nooddeur",
+        titel: "Binnendringer via brandtrap",
         locatie: LOCATIONS[4],
-        personage: "Bram (Facilitair Medewerker)",
+        personage: "Bram (Facilitair)",
         rol: "Melder",
-        greeting: "Fijn dat jullie er zijn! Het alarm van de brandtrap ging af en ik zag direct een onbekende man tussen de studerende studenten glippen.",
+        greeting: "Het brandtrapalarm ging af en er glipte een onbekende man de zaal in!",
         answers: {
-          wie: "Ik ben Bram van de beveiliging. De man hoort hier absoluut niet thuis.",
-          wat: "Onrechtmatige binnendringing via een geforceerde nooduitgang.",
-          waar: "4e etage, nooddeur die direct uitkomt in de ronde studieruimte.",
-          wanneer: "5 minuten geleden, de sirene loeit pas net uit.",
-          waarmee: "Hij heeft de deurstang geforceerd met een breekijzer dat nog buiten lag.",
-          hoe: "Is via de buitenbrandtrap omhoog geklommen en heeft de deur opengewipt.",
-          signalement: "Man, ca. 30 jaar, ca. 1.83m, normaal postuur, lichte huidskleur. Kort stekelig bruin haar met inhammen, stoppelbaardje. Blauw spijkerjasje met witte teddykraag over een grijs shirt. Zwarte strakke spijkerbroek met scheuren op de knieën. Bruine Timberland bergschoenen. Donkerblauwe heuptas schuin over zijn borst en een schaafwond over zijn neus!",
-          vlucht: "Hij dook weg achter de kastenwand richting de nooduitgang zuid."
+          wie: "Ik ben Bram. De man hoort hier absoluut niet thuis.",
+          wat: "Onbevoegde binnendringing via een geforceerde nooddeur.",
+          waar: "4e etage, nooddeur van de ronde studieruimte.",
+          wanneer: "Net 4 minuten geleden.",
+          waarmee: "Heeft de buitendeur opengebroken met een ijzeren staaf.",
+          hoe: "Klom via de stalen buitentrap omhoog en trapte de deurstang in.",
+          signalement: "Man, ca. 30 jaar, ca. 1.83m, normaal postuur, lichte huid. Stekelig bruin haar met inhammen, stoppelbaard. Blauw spijkerjasje met witte teddykraag over grijs shirt. Zwarte strakke jeans met scheuren op de knieën. Bruine Timberland schoenen. Blauwe heuptas over de borst en schaafwond op neus!",
+          vlucht: "Dook weg achter de kastenwand naar nooduitgang zuid."
         }
       },
       {
         id: 15,
-        titel: "Misbruik gestolen directiepas",
+        titel: "Misbruik gestolen medewerkerspas",
         locatie: LOCATIONS[0],
         personage: "Nora (Beveiliging)",
         rol: "Melder",
-        greeting: "Collega's, we zagen zojuist dat iemand probeerde binnen te dringen met de als gestolen geregistreerde pas van de directrice!",
+        greeting: "Attentie collega's! Een vrouw probeerde de examenkluis te openen met een gestolen pas!",
         answers: {
-          wie: "Ik ben Nora, surveillance. De vrouw deed alsof ze een externe accountant was.",
-          wat: "Gebruik van een gestolen toegangspas en poging tot diefstal van vertrouwelijke examendocumenten.",
-          waar: "Kamer voor Onderwijsondersteuning en examenopslag, 3e etage.",
-          wanneer: "Rond 7 minuten geleden.",
-          waarmee: "Een elektronische mastercard die vanochtend als vermist was opgegeven.",
-          hoe: "Hield herhaaldelijk de pas voor de cardreader, maar het systeem weigerde en gaf een stil alarm.",
-          signalement: "Vrouw, 35-40 jaar, ca. 1.70m, normaal/atletisch postuur, donkere huidskleur. Zwart haar in tientallen dunne vlechtjes (box braids) met gouden kraaltjes aan het eind. Crèmekleurige lange trenchcoat over een zakelijke donkerblauwe blouse en nette pantalon. Zwarte platte lakschoenen. Grote zwarte leren aktetas en sterke zoete parfumgeur!",
-          vlucht: "Toen het alarm piepte, haastte ze zich direct via de lift naar beneden."
+          wie: "Ik ben Nora van de surveillance. De vrouw deed alsof ze een auditor was.",
+          wat: "Gebruik gestolen toegangspas en poging tot diefstal van examens.",
+          waar: "Onderwijsondersteuning, kluisruimte 3e etage.",
+          wanneer: "Ongeveer 6 minuten geleden.",
+          waarmee: "Gemanipuleerde mastercard van een directielid.",
+          hoe: "Hield herhaaldelijk de pas voor de scanner tot het alarm afging.",
+          signalement: "Vrouw, 35-40 jaar, ca. 1.70m, atletisch postuur, donkere huidskleur. Zwart haar in dunne vlechtjes (box braids) met gouden kralen aan de uiteinden. Crèmekleurige trenchcoat over marineblauwe blouse en pantalon. Zwarte lakschoenen. Grote zwarte leren aktetas en sterke zoete parfumgeur!",
+          vlucht: "Haastte zich via de lift naar de begane grond."
         }
       }
     ];
 
-    /* 3. AUDIO EFFECTEN (Synthetische Web Audio C2000) */
+    /* =========================================================================
+       3. ECHTE SPRAAKVERZENDING (PTT) MET AUDIO-EFFECTEN
+       ========================================================================= */
     let audioCtx = null;
-    function getAudioCtx() {
-      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      return audioCtx;
+    let micStream = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    async function initMicAndAudio() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+        // Vraag toestemming voor de microfoon van het apparaat
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        document.getElementById('mic-perm-banner').classList.add('hidden');
+        document.getElementById('mic-status-label').textContent = "MICROFOON ACTIEF";
+        playRadioChirp();
+      } catch (err) {
+        alert("Microfoontoegang geweigerd of mislukt: " + err.message + "\nZorg dat de pagina via HTTPS (GitHub Pages) draait!");
+      }
     }
 
-    function playC2000Chirp() {
+    // TETRA C2000 Radio Bleep
+    function playRadioChirp() {
       try {
-        const ctx = getAudioCtx();
-        const now = ctx.currentTime;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(950, now);
+        osc.frequency.setValueAtTime(920, now);
         osc.frequency.setValueAtTime(1250, now + 0.08);
         gain.gain.setValueAtTime(0.2, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(audioCtx.destination);
         osc.start(now);
         osc.stop(now + 0.22);
-      } catch(e){}
+      } catch(e) {}
     }
 
+    // Radio Squelch ruisje
     function playSquelchNoise() {
       try {
-        const ctx = getAudioCtx();
-        const bufferSize = ctx.sampleRate * 0.12;
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        if (!audioCtx) return;
+        const duration = 0.12;
+        const bufferSize = audioCtx.sampleRate * duration;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-        const noise = ctx.createBufferSource();
+
+        const noise = audioCtx.createBufferSource();
         noise.buffer = buffer;
-        const filter = ctx.createBiquadFilter();
+        const filter = audioCtx.createBiquadFilter();
         filter.type = 'bandpass';
         filter.frequency.value = 1400;
         filter.Q.value = 2;
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.15, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
         noise.connect(filter);
         filter.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(audioCtx.destination);
         noise.start();
-      } catch(e){}
+      } catch(e) {}
     }
 
-    /* 4. APPLICATIESTATUS & MOBIELE TAB-NAVIGATIE */
+    // PTT KNOP EVENTS (Touch & Muis)
+    const pttBtn = document.getElementById('btn-ptt');
+
+    pttBtn.addEventListener('mousedown', startVoiceRecording);
+    pttBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startVoiceRecording(); });
+
+    pttBtn.addEventListener('mouseup', stopVoiceRecording);
+    pttBtn.addEventListener('touchend', (e) => { e.preventDefault(); stopVoiceRecording(); });
+    pttBtn.addEventListener('touchcancel', (e) => { e.preventDefault(); stopVoiceRecording(); });
+
+    async function startVoiceRecording() {
+      if (isRecording) return;
+      if (!micStream) {
+        await initMicAndAudio();
+        if (!micStream) return;
+      }
+
+      isRecording = true;
+      audioChunks = [];
+      pttBtn.classList.add('ptt-active');
+      document.getElementById('ptt-label').textContent = "● SPREEK NU...";
+      document.getElementById('lcd-status-label').textContent = "● TX (ZENDEN)";
+
+      playRadioChirp();
+
+      // Start opname
+      try {
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+        mediaRecorder = new MediaRecorder(micStream, { mimeType });
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = uploadVoiceMessage;
+        mediaRecorder.start();
+      } catch (err) {
+        console.error("Opnamefout:", err);
+      }
+    }
+
+    function stopVoiceRecording() {
+      if (!isRecording) return;
+      isRecording = false;
+      pttBtn.classList.remove('ptt-active');
+      document.getElementById('ptt-label').textContent = "HOUD INGEDRUKT OM TE PRATEN (PTT)";
+      document.getElementById('lcd-status-label').textContent = "● STAND-BY";
+
+      playSquelchNoise();
+
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    }
+
+    // Spraak omzetten naar Base64 en naar Firebase sturen
+    function uploadVoiceMessage() {
+      if (audioChunks.length === 0) return;
+      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => {
+        const base64Audio = reader.result;
+        db.ref(`${DB_ROOT}/duos/${currentDuo}/voiceMsg`).set({
+          audio: base64Audio,
+          senderRole: currentRole,
+          timestamp: Date.now()
+        });
+      };
+    }
+
+    // Afspelen van binnenkomende spraak met portofoon-soundfilter
+    function playIncomingVoice(base64Audio) {
+      playRadioChirp();
+      setTimeout(() => {
+        const audio = new Audio(base64Audio);
+
+        // Verbind audio met Web Audio bandpass filter voor een rauw porto-geluid
+        if (audioCtx) {
+          try {
+            const source = audioCtx.createMediaElementSource(audio);
+            const bandpass = audioCtx.createBiquadFilter();
+            bandpass.type = 'bandpass';
+            bandpass.frequency.value = 1600;
+            bandpass.Q.value = 1.2;
+
+            source.connect(bandpass);
+            bandpass.connect(audioCtx.destination);
+          } catch(e) {
+            // Fallback direct
+          }
+        }
+
+        document.getElementById('lcd-status-label').textContent = "● RX (SPRAAK)";
+        document.getElementById('lcd-main-title').textContent = "INVOICE ONTVANGEN";
+
+        audio.play().catch(e => console.log("Autoplay blocked, tik op het scherm:", e));
+
+        audio.onended = () => {
+          playSquelchNoise();
+          document.getElementById('lcd-status-label').textContent = "● STAND-BY";
+          document.getElementById('lcd-main-title').textContent = "KANAAL OPEN";
+        };
+      }, 250);
+    }
+
+    /* =========================================================================
+       4. DUO & ROLSTATUS
+       ========================================================================= */
     let currentDuo = 'DUO-01';
     let currentRole = 'loper'; // 'loper' of 'oc'
     let activeCase = null;
     let discoveredW = new Set();
     let currentFeedbacksTargetId = null;
+    let lastVoiceTimestamp = Date.now();
 
-    // Kanalen vullen in select
+    // Vul kanalen DUO-01 t/m DUO-15
     const chanSel = document.getElementById('channel-select');
     for (let i = 1; i <= 15; i++) {
       const val = `DUO-${i < 10 ? '0' + i : i}`;
@@ -758,20 +812,47 @@
       opt.textContent = val;
       chanSel.appendChild(opt);
     }
+
     chanSel.addEventListener('change', (e) => {
       currentDuo = e.target.value;
-      document.getElementById('lcd-channel-tag').textContent = `CH: ${currentDuo}`;
-      listenForDuoState();
+      document.getElementById('lcd-channel-label').textContent = `CH: ${currentDuo}`;
+      listenForDuoData();
     });
 
-    function switchTab(tabName) {
+    function toggleUserRole() {
+      currentRole = (currentRole === 'loper') ? 'oc' : 'loper';
+      updateRoleViews();
+      playRadioChirp();
+    }
+
+    function updateRoleViews() {
+      const btn = document.getElementById('role-toggle-btn');
+      const vOc = document.getElementById('view-oc');
+      const vLoper = document.getElementById('view-loper');
+      const lcdRole = document.getElementById('lcd-role-label');
+
+      if (currentRole === 'oc') {
+        btn.textContent = '🎧 OC';
+        btn.className = 'bg-slate-800 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-amber-400';
+        vOc.classList.remove('hidden');
+        vLoper.classList.add('hidden');
+        lcdRole.textContent = 'ROL: OC';
+      } else {
+        btn.textContent = '🏃 Loper';
+        btn.className = 'bg-slate-800 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-blue-400';
+        vOc.classList.add('hidden');
+        vLoper.classList.remove('hidden');
+        lcdRole.textContent = 'ROL: LOPER';
+      }
+    }
+
+    function navigateToTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
-      // Nav knoppen stylen
       const tabs = ['porto', 'verhoor', 'astma', 'feed'];
       tabs.forEach(t => {
-        const btn = document.getElementById(`nav-btn-${t}`);
+        const btn = document.getElementById(`nav-${t}`);
         if (t === tabName) {
           btn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-blue-400 font-bold transition";
         } else {
@@ -779,110 +860,74 @@
         }
       });
 
-      // Badge weghalen bij openen verhoor
       if (tabName === 'verhoor') {
-        document.getElementById('nav-badge-chat').classList.add('hidden');
+        document.getElementById('chat-notification-dot').classList.add('hidden');
       }
     }
 
-    function manualSwitchRole() {
-      currentRole = (currentRole === 'loper') ? 'oc' : 'loper';
-      updateRoleUI();
-      playC2000Chirp();
-    }
-
-    function updateRoleUI() {
-      const qBtn = document.getElementById('role-quick-btn');
-      const pOc = document.getElementById('panel-oc');
-      const pLoper = document.getElementById('panel-loper');
-
-      if (currentRole === 'oc') {
-        qBtn.textContent = '🎧 OC';
-        qBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-amber-400';
-        pOc.classList.remove('hidden');
-        pLoper.classList.add('hidden');
-      } else {
-        qBtn.textContent = '🏃 Loper';
-        qBtn.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-blue-400';
-        pOc.classList.add('hidden');
-        pLoper.classList.remove('hidden');
-      }
-    }
-
-    /* 5. OC ACTIES: CASUS KIEZEN & UITGIFTE */
+    /* =========================================================================
+       5. OC ACTIES: CASUS TOEWIJZEN EN DOORSTUREN
+       ========================================================================= */
     function pickRandomCaseForOC() {
       const rand = Math.floor(Math.random() * CASUSSEN.length);
       activeCase = CASUSSEN[rand];
 
       document.getElementById('oc-briefing-text').innerHTML = `
-        <strong class="text-white">${activeCase.titel} (#${activeCase.id})</strong><br>
+        <strong class="text-white">${activeCase.titel}</strong><br>
         <span class="text-amber-300 font-semibold">${activeCase.locatie.name}</span><br>
-        <span class="text-slate-400">${activeCase.greeting}</span>
+        <span class="text-slate-400 text-[10px]">${activeCase.greeting}</span>
       `;
-      playC2000Chirp();
+      playRadioChirp();
     }
 
-    function dispatchUnitViaPorto() {
+    function broadcastCaseToPartner() {
       if (!activeCase) {
-        alert("Selecteer eerst een nieuw incident!");
+        alert("Kies eerst een incident via 'Nieuw Incident'!");
         return;
       }
 
-      playSquelchNoise();
-      setTimeout(playC2000Chirp, 120);
-
-      const payload = {
-        duo: currentDuo,
+      db.ref(`${DB_ROOT}/duos/${currentDuo}/mission`).set({
         caseId: activeCase.id,
-        status: 'DISPATCHED',
-        time: Date.now()
-      };
+        dispatchedAt: Date.now()
+      });
 
-      saveDuoState(payload);
-
-      document.getElementById('lcd-live-status').textContent = '● TX (ZENDEN)';
-      document.getElementById('lcd-headline').textContent = 'OPDRACHT VERZONDEN';
-      document.getElementById('lcd-subline').textContent = activeCase.locatie.name;
+      document.getElementById('lcd-main-title').textContent = 'LOCATIE VERZONDEN';
+      document.getElementById('lcd-sub-title').textContent = activeCase.locatie.name;
       document.getElementById('lcd-loc-tag').textContent = `LOC: ${activeCase.locatie.id.toUpperCase()}`;
-
-      setTimeout(() => {
-        document.getElementById('lcd-live-status').textContent = '● STAND-BY';
-      }, 3000);
+      playRadioChirp();
     }
 
-    /* 6. LOPER ACTIE: AANKOMST & STARTEN VAN CHATBOT VERHOOR */
+    /* =========================================================================
+       6. LOPER ACTIE: AANKOMST & START VAN CHATBOT VERHOOR
+       ========================================================================= */
     function unitArrivedAtScene() {
       if (!activeCase) return;
 
-      playC2000Chirp();
+      playRadioChirp();
       setTimeout(playSquelchNoise, 150);
 
-      document.getElementById('lcd-live-status').textContent = '● 10-23 T.P.';
-      document.getElementById('lcd-headline').textContent = 'TER PLAATSE!';
-      document.getElementById('lcd-subline').textContent = activeCase.locatie.name;
+      document.getElementById('lcd-status-label').textContent = '● 10-23 T.P.';
+      document.getElementById('lcd-main-title').textContent = 'TER PLAATSE';
 
-      // Initialiseer de Chatbot voor deze specifieke casus
-      initChatbotForCase(activeCase);
-
-      // Schakel over naar het verhoor tabblad
-      document.getElementById('nav-badge-chat').classList.remove('hidden');
-      switchTab('verhoor');
+      setupChatbotForCase(activeCase);
+      document.getElementById('chat-notification-dot').classList.remove('hidden');
+      navigateToTab('verhoor');
     }
 
-    function initChatbotForCase(c) {
+    function setupChatbotForCase(c) {
       discoveredW.clear();
       updateWChecklist();
 
-      document.getElementById('bot-character-name').textContent = `${c.personage} (${c.rol})`;
-      document.getElementById('bot-character-role').textContent = `${c.locatie.name}`;
+      document.getElementById('bot-name-label').textContent = `${c.personage} (${c.rol})`;
+      document.getElementById('bot-role-label').textContent = `${c.locatie.name}`;
 
-      const chatBox = document.getElementById('chat-messages');
+      const chatBox = document.getElementById('chat-stream');
       chatBox.innerHTML = `
         <div class="flex gap-2 items-start">
           <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs flex-shrink-0">
             👤
           </div>
-          <div class="chat-bubble-bot p-3 text-slate-200 text-xs shadow leading-relaxed max-w-[85%]">
+          <div class="chat-bubble-bot p-2.5 text-slate-200 text-xs shadow leading-relaxed max-w-[85%]">
             <span class="text-[10px] font-bold text-amber-400 block mb-0.5">${c.personage}:</span>
             "${c.greeting}"
           </div>
@@ -890,10 +935,9 @@
       `;
     }
 
-    /* 7. CHATBOT INTERACTIE: GOUDEN W'S ONTHULLEN */
-    function askBotQuestion(questionType) {
+    function askBotQuestion(qType) {
       if (!activeCase) {
-        alert("Nog geen casus actief. Vraag eerst een opdracht aan de meldkamer!");
+        alert("Geen actieve casus. Vraag het OC om een melding!");
         return;
       }
 
@@ -901,91 +945,53 @@
         wie: "Wie bent u en wie was erbij betrokken?",
         wat: "Wat is er precies gebeurd?",
         waar: "Waar vond het incident exact plaats?",
-        wanneer: "Hoe laat gebeurde dit en hoe lang geleden?",
-        signalement: "Hoe zag de verdachte eruit van top tot teen?",
+        wanneer: "Hoe laat was dit en hoe lang geleden?",
+        signalement: "Hoe zag de verdachte er van top tot teen uit?",
         waarmee: "Waren er wapens of geweld bij gebruikt?",
         vlucht: "Waar rende de verdachte heen?"
       };
 
-      appendUserChatMessage(qMap[questionType] || "Kunt u meer vertellen?");
+      appendUserChat(qMap[qType]);
 
-      // Bot antwoord simuleren met mini-vertraging
       setTimeout(() => {
-        let answerText = activeCase.answers[questionType] || "Dat weet ik helaas niet precies agent.";
-        appendBotChatMessage(answerText);
+        let answer = activeCase.answers[qType] || "Dat weet ik helaas niet precies.";
+        appendBotChat(answer);
         playSquelchNoise();
 
-        // Update ontdekte Gouden W's
-        if (questionType === 'vlucht') {
-          discoveredW.add('hoe');
-        } else {
-          discoveredW.add(questionType);
-        }
+        if (qType === 'vlucht') discoveredW.add('hoe');
+        else discoveredW.add(qType);
         updateWChecklist();
       }, 400);
     }
 
-    function handleCustomChatSubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('chat-custom-input');
-      const text = input.value.trim().toLowerCase();
-      if (!text) return;
-
-      appendUserChatMessage(input.value.trim());
-      input.value = '';
-
-      setTimeout(() => {
-        let matchedType = 'wat';
-        if (text.includes('wie') || text.includes('naam')) matchedType = 'wie';
-        else if (text.includes('waar') || text.includes('plek') || text.includes('locatie')) matchedType = 'waar';
-        else if (text.includes('wanneer') || text.includes('tijd') || text.includes('laat')) matchedType = 'wanneer';
-        else if (text.includes('signaal') || text.includes('kleding') || text.includes('haar') || text.includes('jas') || text.includes('schoen') || text.includes('uiterlijk')) matchedType = 'signalement';
-        else if (text.includes('wapen') || text.includes('mes') || text.includes('geweld')) matchedType = 'waarmee';
-        else if (text.includes('vlucht') || text.includes('heen') || text.includes('weg')) matchedType = 'vlucht';
-
-        let resp = activeCase.answers[matchedType] || activeCase.greeting;
-        appendBotChatMessage(resp);
-        playSquelchNoise();
-
-        discoveredW.add(matchedType);
-        updateWChecklist();
-      }, 400);
-    }
-
-    function appendUserChatMessage(msg) {
-      const box = document.getElementById('chat-messages');
+    function appendUserChat(msg) {
+      const b = document.getElementById('chat-stream');
       const div = document.createElement('div');
       div.className = "flex justify-end";
-      div.innerHTML = `
-        <div class="chat-bubble-user p-2.5 px-3 text-white text-xs shadow max-w-[85%] leading-relaxed">
-          ${msg}
-        </div>
-      `;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
+      div.innerHTML = `<div class="chat-bubble-user p-2 px-3 text-white text-xs max-w-[85%]">${msg}</div>`;
+      b.appendChild(div);
+      b.scrollTop = b.scrollHeight;
     }
 
-    function appendBotChatMessage(msg) {
-      const box = document.getElementById('chat-messages');
+    function appendBotChat(msg) {
+      const b = document.getElementById('chat-stream');
       const div = document.createElement('div');
       div.className = "flex gap-2 items-start";
       div.innerHTML = `
-        <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs flex-shrink-0">
-          👤
-        </div>
-        <div class="chat-bubble-bot p-2.5 px-3 text-slate-200 text-xs shadow leading-relaxed max-w-[85%]">
+        <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs flex-shrink-0">👤</div>
+        <div class="chat-bubble-bot p-2.5 text-slate-200 text-xs max-w-[85%]">
           <span class="text-[10px] font-bold text-amber-400 block mb-0.5">${activeCase.personage}:</span>
           "${msg}"
         </div>
       `;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
+      b.appendChild(div);
+      b.scrollTop = b.scrollHeight;
     }
 
     function updateWChecklist() {
-      const wKeys = ['wie', 'wat', 'waar', 'wanneer', 'waarmee', 'hoe', 'signalement'];
+      const keys = ['wie', 'wat', 'waar', 'wanneer', 'waarmee', 'hoe', 'signalement'];
       let count = 0;
-      wKeys.forEach(k => {
+      keys.forEach(k => {
         const chip = document.getElementById(`chip-${k}`);
         if (discoveredW.has(k)) {
           chip.className = "px-1.5 py-0.5 rounded bg-emerald-600/40 text-emerald-300 border border-emerald-500/60";
@@ -994,21 +1000,22 @@
           chip.className = "px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700";
         }
       });
-
       document.getElementById('w-counter').textContent = `${count} / 7`;
     }
 
-    /* 8. ASTMA MUTATIE VERSTUREN */
-    function submitAstmaMutation(e) {
+    /* =========================================================================
+       7. ASTMA MUTATIE VERSTUREN & ROLLEN WISSELEN
+       ========================================================================= */
+    function handleMutationSubmit(e) {
       e.preventDefault();
 
-      const a = document.getElementById('form-a').value.trim();
-      const s = document.getElementById('form-s').value.trim();
-      const t = document.getElementById('form-t').value.trim();
-      const m = document.getElementById('form-m').value.trim();
-      const afh = document.getElementById('form-afh').value.trim();
+      const a = document.getElementById('input-a').value.trim();
+      const s = document.getElementById('input-s').value.trim();
+      const t = document.getElementById('input-t').value.trim();
+      const m = document.getElementById('input-m').value.trim();
+      const afh = document.getElementById('input-afh').value.trim();
 
-      const payload = {
+      const newMut = {
         id: 'MUT_' + Date.now(),
         duo: currentDuo,
         caseTitle: activeCase ? activeCase.titel : 'Eigen casus',
@@ -1019,119 +1026,80 @@
         feedbacks: []
       };
 
-      saveMutation(payload);
+      db.ref(`${DB_ROOT}/mutations/${newMut.id}`).set(newMut);
 
       document.getElementById('astma-form').reset();
-      alert("✅ Mutatie ingediend! De rollen binnen Duo " + currentDuo + " worden nu gewisseld.");
+      alert("✅ Mutatie opgeslagen! De rollen binnen " + currentDuo + " worden nu gewisseld.");
 
-      manualSwitchRole();
-      switchTab('feed');
+      toggleUserRole();
+      navigateToTab('feed');
     }
 
-    /* 9. FIREBASE SYNC & REALTIME DATABASE */
-    function saveDuoState(payload) {
-      if (useFirebase) {
-        database.ref(`${DB_ROOT}/duos/${payload.duo}`).set(payload);
-      } else {
-        localStorage.setItem(`duo_${payload.duo}`, JSON.stringify(payload));
-        if (broadcast) broadcast.postMessage({ type: 'DUO_SYNC', data: payload });
-      }
-    }
+    /* =========================================================================
+       8. REALTIME DATABASE LISTENERS VOOR VOICE & CASUS
+       ========================================================================= */
+    function listenForDuoData() {
+      // Luister naar spraakberichten (Voice PTT)
+      db.ref(`${DB_ROOT}/duos/${currentDuo}/voiceMsg`).on('value', snap => {
+        const data = snap.val();
+        if (!data) return;
 
-    function saveMutation(mut) {
-      if (useFirebase) {
-        database.ref(`${DB_ROOT}/mutations/${mut.id}`).set(mut);
-      } else {
-        const list = JSON.parse(localStorage.getItem('muts_db') || '[]');
-        list.push(mut);
-        localStorage.setItem('muts_db', JSON.stringify(list));
-        if (broadcast) broadcast.postMessage({ type: 'FEED_SYNC', data: list });
-        renderFeed(list);
-      }
-    }
-
-    function appendFeedback(mutId, fb) {
-      if (useFirebase) {
-        database.ref(`${DB_ROOT}/mutations/${mutId}/feedbacks`).push(fb);
-      } else {
-        const list = JSON.parse(localStorage.getItem('muts_db') || '[]');
-        const target = list.find(m => m.id === mutId);
-        if (target) {
-          if (!target.feedbacks) target.feedbacks = [];
-          target.feedbacks.push(fb);
-          localStorage.setItem('muts_db', JSON.stringify(list));
-          if (broadcast) broadcast.postMessage({ type: 'FEED_SYNC', data: list });
-          renderFeed(list);
+        // Speel alleen af als het bericht van de partner komt en nieuw is
+        if (data.timestamp > lastVoiceTimestamp && data.senderRole !== currentRole) {
+          lastVoiceTimestamp = data.timestamp;
+          playIncomingVoice(data.audio);
         }
-      }
-    }
+      });
 
-    function listenForDuoState() {
-      if (useFirebase) {
-        database.ref(`${DB_ROOT}/duos/${currentDuo}`).on('value', snap => {
-          handleIncomingDuo(snap.val());
-        });
-      }
-    }
+      // Luister naar incidentuitgifte (Missions)
+      db.ref(`${DB_ROOT}/duos/${currentDuo}/mission`).on('value', snap => {
+        const data = snap.val();
+        if (!data) return;
 
-    function handleIncomingDuo(data) {
-      if (!data) return;
-      if (data.status === 'DISPATCHED') {
         const c = CASUSSEN.find(item => item.id === data.caseId);
         if (c) {
           activeCase = c;
-          playSquelchNoise();
-          setTimeout(playC2000Chirp, 120);
+          if (currentRole === 'loper') {
+            playRadioChirp();
+            document.getElementById('lcd-main-title').textContent = 'OPDRACHT ONTVANGEN!';
+            document.getElementById('lcd-sub-title').textContent = c.locatie.name;
+            document.getElementById('lcd-loc-tag').textContent = `LOC: ${c.locatie.id.toUpperCase()}`;
 
-          document.getElementById('lcd-live-status').textContent = '● RX (OPROEP)';
-          document.getElementById('lcd-headline').textContent = 'OPDRACHT ONTVANGEN!';
-          document.getElementById('lcd-subline').textContent = c.locatie.name;
-          document.getElementById('lcd-loc-tag').textContent = `LOC: ${c.locatie.id.toUpperCase()}`;
-
-          document.getElementById('loper-instruction-text').innerHTML = `
-            Ga met spoed naar: <strong class="text-amber-300 block text-xs mt-0.5">${c.locatie.name}</strong>
-            <span class="text-[10px] text-slate-400 mt-1 block">Klik op 'Ik ben er' als je op de etage staat!</span>
-          `;
-          document.getElementById('btn-arrived').disabled = false;
-        }
-      }
-    }
-
-    function listenToMutations() {
-      if (useFirebase) {
-        database.ref(`${DB_ROOT}/mutations`).on('value', snap => {
-          const val = snap.val();
-          if (!val) {
-            renderFeed([]);
-            return;
+            document.getElementById('loper-instruction').innerHTML = `
+              Ga nu met spoed naar: <strong class="text-amber-300 block text-xs mt-0.5">${c.locatie.name}</strong>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Druk pas op 'Ik ben er' als je op de etage staat!</span>
+            `;
+            document.getElementById('btn-arrived').disabled = false;
           }
-          const arr = Object.keys(val).map(k => {
-            const item = val[k];
-            const fbs = item.feedbacks ? Object.values(item.feedbacks) : [];
-            return { ...item, feedbacks: fbs };
-          });
-          renderFeed(arr);
-        });
-      } else {
-        const local = JSON.parse(localStorage.getItem('muts_db') || '[]');
-        renderFeed(local);
-      }
+        }
+      });
     }
 
-    /* 10. LIVEFEED & PEER-FEEDBACK */
+    /* =========================================================================
+       9. LIVEFEED & PEER-FEEDBACK
+       ========================================================================= */
     let cachedFeed = [];
-    function renderFeed(list) {
-      cachedFeed = list;
-      const box = document.getElementById('livefeed-list');
-      document.getElementById('feed-count-badge').textContent = `${list.length} ingediend`;
+    db.ref(`${DB_ROOT}/mutations`).on('value', snap => {
+      const val = snap.val();
+      if (!val) {
+        renderFeedList([]);
+        return;
+      }
+      const list = Object.keys(val).map(k => {
+        const item = val[k];
+        const fbs = item.feedbacks ? Object.values(item.feedbacks) : [];
+        return { ...item, feedbacks: fbs };
+      });
+      renderFeedList(list);
+    });
 
-      if (!list || list.length === 0) {
-        box.innerHTML = `
-          <div class="text-center py-10 text-slate-500 text-xs">
-            <i class="fa-solid fa-inbox text-2xl mb-1.5 block"></i>
-            Nog geen mutaties ingediend. Zodra een duo een ASTMA-mutatie inlevert, verschijnt deze direct hier.
-          </div>
-        `;
+    function renderFeedList(list) {
+      cachedFeed = list;
+      const box = document.getElementById('feed-list');
+      document.getElementById('feed-count').textContent = `${list.length} ingediend`;
+
+      if (list.length === 0) {
+        box.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">Nog geen mutaties ingediend.</div>`;
         return;
       }
 
@@ -1158,26 +1126,22 @@
               <span class="text-[10px] text-slate-500 font-mono">${m.timestamp}</span>
             </div>
 
-            <!-- ASTMA snippet -->
-            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-300 space-y-1">
+            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-300 space-y-1">
               <div><strong class="text-blue-400">A:</strong> ${m.astma.a}</div>
               <div><strong class="text-blue-400">S:</strong> ${m.astma.s}</div>
-              <div class="bg-amber-950/20 pl-1 border-l border-amber-500/50"><strong class="text-amber-300">T (Signalement):</strong> ${m.astma.t}</div>
+              <div class="bg-amber-950/20 pl-1 border-l border-amber-500/50"><strong class="text-amber-300">T:</strong> ${m.astma.t}</div>
               <div><strong class="text-blue-400">M:</strong> ${m.astma.m}</div>
               <div><strong class="text-blue-400">A:</strong> ${m.astma.afh}</div>
             </div>
 
-            <!-- Peer feedback actie -->
             <div class="flex justify-between items-center pt-1 border-t border-slate-800">
               <span class="text-[10px] font-bold text-slate-400">Peer Reviews (${m.feedbacks ? m.feedbacks.length : 0})</span>
-              <button onclick="openFeedbackModal('${m.id}')" class="bg-slate-800 hover:bg-slate-700 text-blue-300 text-[11px] px-2.5 py-1 rounded-lg border border-slate-700 font-medium">
+              <button onclick="openFeedbackModal('${m.id}')" class="bg-slate-800 hover:bg-slate-700 text-blue-300 text-[11px] px-2.5 py-1 rounded-lg border border-slate-700">
                 <i class="fa-solid fa-plus text-[10px]"></i> Reviewen
               </button>
             </div>
 
-            <div class="space-y-1.5 pt-1">
-              ${fbHtml}
-            </div>
+            <div class="space-y-1 pt-1">${fbHtml}</div>
           </div>
         `;
       }).join('');
@@ -1188,9 +1152,9 @@
       const target = cachedFeed.find(m => m.id === mutId);
       if (!target) return;
 
-      document.getElementById('modal-mutation-preview').innerHTML = `
+      document.getElementById('feedback-preview-text').innerHTML = `
         <strong>${target.duo} - ${target.caseTitle}</strong><br>
-        <span class="text-amber-300">T (Signalement):</span> ${target.astma.t}
+        <span class="text-amber-300">T:</span> ${target.astma.t}
       `;
       document.getElementById('feedback-modal').classList.remove('hidden');
     }
@@ -1200,58 +1164,45 @@
       currentFeedbacksTargetId = null;
     }
 
-    function submitPeerFeedback(e) {
+    function handlePeerFeedbackSubmit(e) {
       e.preventDefault();
       if (!currentFeedbacksTargetId) return;
 
       const fb = {
         reviewer: currentDuo,
-        sigScore: document.getElementById('fb-score-sig').value,
-        top: document.getElementById('fb-input-top').value.trim(),
-        tip: document.getElementById('fb-input-tip').value.trim(),
+        sigScore: document.getElementById('fb-sig-score').value,
+        top: document.getElementById('fb-top-text').value.trim(),
+        tip: document.getElementById('fb-tip-text').value.trim(),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
-      appendFeedback(currentFeedbacksTargetId, fb);
+      db.ref(`${DB_ROOT}/mutations/${currentFeedbacksTargetId}/feedbacks`).push(fb);
       closeFeedbackModal();
-      document.getElementById('fb-input-top').value = '';
-      document.getElementById('fb-input-tip').value = '';
-      playC2000Chirp();
+      document.getElementById('fb-top-text').value = '';
+      document.getElementById('fb-tip-text').value = '';
+      playRadioChirp();
     }
 
-    /* 11. COMPLETE DATABASE RESETTEN (Master Reset Knop) */
+    /* =========================================================================
+       10. DATABASE RESETTEN (Master Reset Knop)
+       ========================================================================= */
     function resetWholeDatabase() {
-      const ok = confirm("⚠️ GEHELE DATABASE LEASMAKEN?\n\nHiermee wis je alle mutaties, feedback en porto-oproepen in Firebase voor de hele klas.");
+      const ok = confirm("⚠️ GEHELE DATABASE RESETTEN?\n\nHiermee wis je alle actieve oproepen, spraakberichten en mutaties voor de hele klas.");
       if (!ok) return;
 
-      if (useFirebase) {
-        database.ref(DB_ROOT).remove()
-          .then(() => {
-            alert("Database q2les3samirgem is volledig leeggemaakt.");
-            location.reload();
-          })
-          .catch(e => alert("Fout: " + e.message));
-      } else {
-        localStorage.clear();
-        if (broadcast) broadcast.postMessage({ type: 'RESET_ALL' });
-        location.reload();
-      }
+      db.ref(DB_ROOT).remove()
+        .then(() => {
+          alert("Database succesvol gereset.");
+          location.reload();
+        })
+        .catch(err => alert("Fout bij resetten: " + err.message));
     }
 
-    if (broadcast) {
-      broadcast.onmessage = (e) => {
-        if (e.data.type === 'DUO_SYNC' && e.data.data.duo === currentDuo) handleIncomingDuo(e.data.data);
-        if (e.data.type === 'FEED_SYNC') renderFeed(e.data.data);
-        if (e.data.type === 'RESET_ALL') location.reload();
-      };
-    }
-
-    // Start-up initialisaties
+    // Start-up
     window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('lcd-channel-tag').textContent = `CH: ${currentDuo}`;
-      updateRoleUI();
-      listenForDuoState();
-      listenToMutations();
+      document.getElementById('lcd-channel-label').textContent = `CH: ${currentDuo}`;
+      updateRoleViews();
+      listenForDuoData();
     });
   </script>
 </body>
