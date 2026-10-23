@@ -59,7 +59,7 @@
   <main class="max-w-md mx-auto px-3 pt-3">
 
     <!-- =========================================================================
-         TAB 1: DE PORTOFOON & OC MELDING MET FOTO
+         TAB 1: DE PORTOFOON & OC MELDING MET SIGNALEMENT & FOTO
          ========================================================================= -->
     <section id="tab-porto" class="tab-content space-y-3">
 
@@ -109,7 +109,7 @@
             </div>
           </div>
 
-          <!-- SCHERM VOOR OC (STUDENT 2): MET FOTO & BEVESTIGINGSKNOP -->
+          <!-- SCHERM VOOR OC (STUDENT 2) -->
           <div id="view-oc" class="hidden space-y-2.5 pt-2 border-t border-slate-800">
             <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2">
               <div class="flex justify-between items-center">
@@ -121,14 +121,19 @@
                 </button>
               </div>
 
-              <!-- AFBEELDING / COMPOSITIETEKENING -->
+              <!-- AFBEELDING -->
               <div id="oc-photo-container" class="w-full rounded-xl overflow-hidden border border-slate-700 shadow-inner bg-slate-900 flex justify-center">
-                <!-- Dynamische SVG foto -->
                 <div class="py-8 text-slate-500 text-xs italic">Druk op 'Nieuw Incident' om de melding en foto op te halen.</div>
               </div>
 
-              <div id="oc-case-details" class="text-xs space-y-1">
-                <!-- Tekst details -->
+              <div id="oc-case-details" class="text-xs space-y-1"></div>
+
+              <!-- PORTO VOORLEES-INSTRUCTIE VOOR HET OC -->
+              <div id="oc-speech-prompt" class="hidden bg-amber-950/30 p-2.5 rounded-xl border border-amber-600/40 text-[11px] space-y-1 text-slate-200">
+                <span class="font-bold text-amber-400 block text-[10px] uppercase">
+                  <i class="fa-solid fa-bullhorn"></i> Spreektekst voor via de Porto (PTT):
+                </span>
+                <p id="oc-speech-text" class="italic text-slate-300 font-mono text-[10px]"></p>
               </div>
 
               <!-- BEVESTIGINGSKNOP VOOR HET OC -->
@@ -139,18 +144,28 @@
             </div>
 
             <button id="btn-dispatch-loper" onclick="broadcastCaseToPartner()" disabled class="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
-              <i class="fa-solid fa-paper-plane"></i> 2. Stuur Opdracht Naar Loper
+              <i class="fa-solid fa-paper-plane"></i> 2. Stuur Opdracht + Signalement Naar Loper
             </button>
           </div>
 
           <!-- SCHERM VOOR LOPER (STUDENT 1) -->
           <div id="view-loper" class="space-y-2 pt-1 border-t border-slate-800">
-            <div id="loper-mission-box" class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
-              <span class="text-blue-400 font-bold block mb-0.5 text-[11px]"><i class="fa-solid fa-location-dot"></i> OPDRACHT VAN DE OC:</span>
-              <p id="loper-instruction" class="text-slate-300 text-[11px]">
-                Wacht tot de meldkamer via de porto spreekt en je naar een locatie in het gebouw stuurt...
-              </p>
+            <div id="loper-mission-box" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-2">
+              <div>
+                <span class="text-blue-400 font-bold block mb-0.5 text-[11px]"><i class="fa-solid fa-location-dot"></i> OPDRACHT VAN HET OC:</span>
+                <p id="loper-instruction" class="text-slate-300 text-[11px]">
+                  Wacht tot de meldkamer via de porto spreekt en je naar een locatie stuurt...
+                </p>
+              </div>
+
+              <!-- HET SIGNALEMENT DAT HET OC HEEFT MEEGEGEVEN -->
+              <div id="loper-received-sig-box" class="hidden bg-amber-950/30 p-2.5 rounded-lg border border-amber-600/40 text-[11px]">
+                <strong class="text-amber-400 block mb-0.5"><i class="fa-solid fa-clipboard-user"></i> DOORGEGEVEN SIGNALEMENT VAN HET OC:</strong>
+                <p id="loper-received-sig-text" class="text-slate-200 font-mono text-[10px] leading-relaxed"></p>
+                <span class="text-[9px] text-amber-300/80 block mt-1">⚠️ Controleer ter plaatse of dit klopt en vermeld de overeenkomsten in je mutatie!</span>
+              </div>
             </div>
+
             <button id="btn-arrived" onclick="unitArrivedAtScene()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
               <i class="fa-solid fa-flag-checkered text-base"></i> 📍 Ik ben ter plaatse / Ik ben er
             </button>
@@ -174,7 +189,7 @@
     </section>
 
     <!-- =========================================================================
-         TAB 2: VERHOOR CHATBOT MET FOTO VERGELIJKING
+         TAB 2: VERHOOR CHATBOT MET FOTO & OC-SIGNALEMENT CHECK
          ========================================================================= -->
     <section id="tab-verhoor" class="tab-content hidden space-y-2.5">
       
@@ -197,6 +212,12 @@
         </div>
       </div>
 
+      <!-- OC Signalement referentie tijdens verhoor -->
+      <div id="verhoor-oc-sig-ref" class="hidden bg-slate-900 p-2 rounded-lg border border-slate-800 text-[10px]">
+        <span class="text-amber-400 font-bold block mb-0.5">📋 OC Signalement ter vergelijking:</span>
+        <span id="verhoor-oc-sig-text" class="text-slate-300 font-mono"></span>
+      </div>
+
       <!-- Checklist Chips -->
       <div class="flex flex-wrap gap-1 bg-slate-900/60 p-1.5 rounded-lg border border-slate-800 text-[9px] font-bold">
         <span id="chip-wie" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WIE</span>
@@ -209,7 +230,7 @@
       </div>
 
       <!-- Chat Stream -->
-      <div id="chat-stream" class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 h-[260px] overflow-y-auto space-y-2 text-xs">
+      <div id="chat-stream" class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 h-[240px] overflow-y-auto space-y-2 text-xs">
         <div class="text-center py-12 text-slate-500 text-xs">
           Druk op de Porto-tab op <strong>"Ik ben ter plaatse"</strong> om het verhoor te openen.
         </div>
@@ -228,28 +249,37 @@
     </section>
 
     <!-- =========================================================================
-         TAB 3: ASTMA MUTATIE OPSTELLEN
+         TAB 3: ASTMA MUTATIE MET FEEDFORWARD & OC REFERENTIE
          ========================================================================= -->
     <section id="tab-astma" class="tab-content hidden space-y-3">
+      
+      <!-- OC Signalement Spiekbriefje -->
+      <div class="bg-amber-950/40 rounded-xl p-2.5 border border-amber-600/40 text-xs space-y-1">
+        <span class="font-bold text-amber-300 block text-[11px]"><i class="fa-solid fa-clipboard-check"></i> REFERENTIE SIGNALEMENT OC:</span>
+        <div id="astma-oc-sig-ref" class="text-slate-200 text-[10px] font-mono leading-relaxed">
+          Nog geen melding ontvangen.
+        </div>
+      </div>
+
       <div class="bg-blue-950/40 rounded-xl p-2.5 border border-blue-600/40 text-xs">
-        <span class="font-bold text-blue-300 block mb-0.5"><i class="fa-solid fa-compass"></i> FEEDFORWARD SIGNALEMENT:</span>
+        <span class="font-bold text-blue-300 block mb-0.5"><i class="fa-solid fa-compass"></i> OPDRACHT IN DE ASTMA:</span>
         <span class="text-slate-300 text-[11px]">
-          Zet het signalement in de <strong>'T'</strong> van boven naar beneden: Geslacht &rarr; Leeftijd/Lengte &rarr; Hoofd/Haar &rarr; Bovenkleding &rarr; Broek &rarr; Schoenen &rarr; Bijzonderheden.
+          Noteer in de <strong>A</strong> wat het OC meldde. Noteer in de <strong>T</strong> het ter plaatse vastgestelde signalement en of dit <u>overeenkomt met de gegevens van het OC</u>!
         </span>
       </div>
 
       <form id="astma-form" onsubmit="handleMutationSubmit(event)" class="bg-slate-900 rounded-2xl p-3.5 border border-slate-800 space-y-2">
         <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">A - Aanleiding (Porto-melding OC):</label>
-          <input type="text" id="input-a" required placeholder="Op verzoek van OC ter plaatse gegaan ivm..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">A - Aanleiding (Melding OC + doorgegeven signalement):</label>
+          <input type="text" id="input-a" required placeholder="Op verzoek van OC ter plaatse gegaan. Signalement volgens OC betrof..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
         </div>
         <div>
           <label class="block text-[11px] font-bold text-slate-300 mb-0.5">S - Situatie (Wat trof je aan op locatie?):</label>
           <input type="text" id="input-s" required placeholder="Aldaar troffen wij melder/slachtoffer aan..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
         </div>
         <div>
-          <label class="block text-[11px] font-bold text-amber-300 mb-0.5">T - Toedracht / Treffen (Gouden W's + Volledig Signalement):</label>
-          <textarea id="input-t" rows="4" required placeholder="Verhoor / Toedracht en het complete signalement van boven naar beneden..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono text-base sm:text-xs"></textarea>
+          <label class="block text-[11px] font-bold text-amber-300 mb-0.5">T - Toedracht / Treffen (Signalement + vergelijking met OC):</label>
+          <textarea id="input-t" rows="4" required placeholder="Aangetroffen persoon voldeed wel/niet aan het door OC verstrekte signalement, te weten: Geslacht, leeftijd, kleding van boven naar beneden..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono text-base sm:text-xs"></textarea>
         </div>
         <div>
           <label class="block text-[11px] font-bold text-slate-300 mb-0.5">M - Maatregel:</label>
@@ -291,11 +321,11 @@
 
       <form onsubmit="handlePeerFeedbackSubmit(event)" class="space-y-2 text-xs">
         <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">Volgorde signalement:</label>
+          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">Klopt de overeenkomst met OC signalement?</label>
           <select id="fb-sig-score" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white">
-            <option value="✅ Uitstekend (Volledig van hoofd naar voeten)">✅ Uitstekend (Van hoofd naar voeten)</option>
-            <option value="⚠️ Matig (Mist onderdelen of volgorde klopt niet)">⚠️ Matig (Mist onderdelen)</option>
-            <option value="❌ Onvoldoende (Volgorde door elkaar)">❌ Onvoldoende (Door elkaar)</option>
+            <option value="✅ Uitstekend (Duidelijk vergeleken met OC en volgorde klopt)">✅ Uitstekend (Duidelijk vergeleken met OC)</option>
+            <option value="⚠️ Matig (Vergelijking met OC signalement ontbreekt)">⚠️ Matig (Vergelijking met OC ontbreekt)</option>
+            <option value="❌ Onvoldoende (Geen compleet signalement genoteerd)">❌ Onvoldoende (Geen compleet signalement)</option>
           </select>
         </div>
         <div>
@@ -335,7 +365,7 @@
     </button>
   </nav>
 
-  <!-- SCRIPT LOGICA -->
+  <!-- JAVASCRIPT MOTOR -->
   <script>
     /* =========================================================================
        1. FIREBASE CONFIGURATIE
@@ -355,7 +385,7 @@
     const DB_ROOT = 'mutatieles5';
 
     /* =========================================================================
-       2. LOCATIES & 15 CASUSSEN MET GOUDEN W'S & FOTO-DATA
+       2. LOCATIES & 15 CASUSSEN MET SIGNALEMENTEN
        ========================================================================= */
     const LOCATIONS = [
       { id: 'a', name: 'Onderwijsondersteuning (3e etage)' },
@@ -760,7 +790,7 @@
     }
 
     /* =========================================================================
-       4. OC ACTIES: CASUS KIEZEN, FOTO BEKIJKEN EN BEVESTIGEN
+       4. OC ACTIES: CASUS KIEZEN, FOTO BEKIJKEN, BEVESTIGEN EN SIGNALEMENT MEEGEVEN
        ========================================================================= */
     let isSignalementConfirmedByOC = false;
 
@@ -778,9 +808,14 @@
         <div class="text-amber-300 font-semibold text-[11px]">${activeCase.locatie.name}</div>
         <p class="text-slate-300 italic text-[11px] mt-1">"${activeCase.greeting}"</p>
         <div class="bg-slate-900 p-2 rounded border border-slate-800 text-[10px] font-mono text-slate-300 mt-1">
-          <strong class="text-amber-400">Signalement:</strong> ${activeCase.answers.signalement}
+          <strong class="text-amber-400">Signalement uit melding:</strong> ${activeCase.answers.signalement}
         </div>
       `;
+
+      // Maak spreektekst klaar voor de OC portofoon
+      document.getElementById('oc-speech-prompt').classList.remove('hidden');
+      document.getElementById('oc-speech-text').textContent = 
+        `"Eenheid ${currentDuo} van Meldkamer: Ga met spoed naar ${activeCase.locatie.name} i.v.m. ${activeCase.titel}. Uitkijken naar signalement: ${activeCase.answers.signalement}"`;
 
       // Knoppen resetten
       const confBtn = document.getElementById('btn-confirm-signalement');
@@ -817,12 +852,17 @@
         return;
       }
 
+      // HIER GEVEN WE HET SIGNALEMENT EXPLICIET MEE NAAR DE LOPER VIA FIREBASE
       db.ref(`${DB_ROOT}/duos/${currentDuo}/mission`).set({
         caseId: activeCase.id,
+        locationName: activeCase.locatie.name,
+        locationId: activeCase.locatie.id,
+        signalementOC: activeCase.answers.signalement, // SIGNALEMENT DOORGESTUURD NAAR LOPER!
+        caseTitle: activeCase.titel,
         dispatchedAt: Date.now()
       });
 
-      document.getElementById('lcd-main-title').textContent = 'OPDRACHT VERZONDEN';
+      document.getElementById('lcd-main-title').textContent = 'SIGNALEMENT VERZONDEN';
       document.getElementById('lcd-sub-title').textContent = activeCase.locatie.name;
       document.getElementById('lcd-loc-tag').textContent = `LOC: ${activeCase.locatie.id.toUpperCase()}`;
       playRadioChirp();
@@ -831,6 +871,8 @@
     /* =========================================================================
        5. LOPER ACTIE: AANKOMST & VERHOOR MET FOTO VERGELIJKING
        ========================================================================= */
+    let currentReceivedSignalement = "";
+
     function unitArrivedAtScene() {
       if (!activeCase) return;
 
@@ -854,6 +896,12 @@
 
       // Thumbnail foto toevoegen in verhoor
       document.getElementById('loper-photo-thumbnail').innerHTML = renderCompositeSVG(c);
+
+      // Toon OC signalement ter vergelijking tijdens verhoor
+      if (currentReceivedSignalement) {
+        document.getElementById('verhoor-oc-sig-ref').classList.remove('hidden');
+        document.getElementById('verhoor-oc-sig-text').textContent = currentReceivedSignalement;
+      }
 
       const chatBox = document.getElementById('chat-stream');
       chatBox.innerHTML = `
@@ -880,7 +928,7 @@
         wat: "Wat is er precies gebeurd?",
         waar: "Waar vond het incident exact plaats?",
         wanneer: "Hoe laat was dit en hoe lang geleden?",
-        signalement: "Klopt het signalement en de foto van de meldkamer?",
+        signalement: "Klopt het signalement en de foto van de meldkamer met wat u zag?",
         waarmee: "Waren er wapens of geweld bij gebruikt?",
         vlucht: "Waar rende de verdachte heen?"
       };
@@ -1203,7 +1251,7 @@
     }
 
     /* =========================================================================
-       9. REALTIME LISTENERS
+       9. REALTIME LISTENERS: SPOOR EN SIGNALEMENT ONTVANGEN
        ========================================================================= */
     function listenForDuoData() {
       // Voice listener
@@ -1216,7 +1264,7 @@
         }
       });
 
-      // Opdracht listener
+      // Opdracht + Signalement listener
       db.ref(`${DB_ROOT}/duos/${currentDuo}/mission`).on('value', snap => {
         const data = snap.val();
         if (!data) return;
@@ -1224,16 +1272,28 @@
         const c = CASUSSEN.find(item => item.id === data.caseId);
         if (c) {
           activeCase = c;
+          currentReceivedSignalement = data.signalementOC || c.answers.signalement;
+
+          // Werk referentie bij in het ASTMA-tabblad
+          document.getElementById('astma-oc-sig-ref').innerHTML = `
+            <strong class="text-white">${c.titel}</strong> (${c.locatie.name}):<br>
+            <span class="text-amber-300">${currentReceivedSignalement}</span>
+          `;
+
           if (currentRole === 'loper') {
             playRadioChirp();
-            document.getElementById('lcd-main-title').textContent = 'OPDRACHT ONTVANGEN!';
+            document.getElementById('lcd-main-title').textContent = 'OPDRACHT + SIGNALEMENT!';
             document.getElementById('lcd-sub-title').textContent = c.locatie.name;
             document.getElementById('lcd-loc-tag').textContent = `LOC: ${c.locatie.id.toUpperCase()}`;
 
+            // Toon de opdracht inclusief het OC-signalement
             document.getElementById('loper-instruction').innerHTML = `
-              Ga met spoed naar: <strong class="text-amber-300 block text-xs mt-0.5">${c.locatie.name}</strong>
-              <span class="text-[10px] text-slate-400 mt-0.5 block">Druk op 'Ik ben er' zodra je er staat!</span>
+              Ga nu met spoed naar: <strong class="text-amber-300 block text-xs mt-0.5">${c.locatie.name}</strong>
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Druk op 'Ik ben er' zodra je er fysiek staat!</span>
             `;
+
+            document.getElementById('loper-received-sig-box').classList.remove('hidden');
+            document.getElementById('loper-received-sig-text').textContent = currentReceivedSignalement;
             document.getElementById('btn-arrived').disabled = false;
           }
         }
