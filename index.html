@@ -22,39 +22,39 @@
       transform: scale(0.97);
       box-shadow: inset 0 4px 8px rgba(0,0,0,0.5);
     }
-    .chat-bubble-bot { background-color: #1e293b; border-radius: 1rem 1rem 1rem 0.2rem; }
-    .chat-bubble-user { background-color: #2563eb; border-radius: 1rem 1rem 0.2rem 1rem; }
+    .chat-bubble-bot { background-color: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 1rem 1rem 1rem 0.2rem; }
+    .chat-bubble-user { background-color: #2563eb; color: #ffffff; border-radius: 1rem 1rem 0.2rem 1rem; }
     .scanlines {
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
       background-size: 100% 3px, 4px 100%;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 font-sans select-none antialiased">
+<body class="bg-slate-100 text-slate-800 min-h-screen pb-24 font-sans select-none antialiased">
 
   <!-- ACTIVATIE BANNER VOOR MICROFOON & AUDIO -->
-  <div id="mic-perm-banner" onclick="initMicAndAudio()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2 px-3 text-center cursor-pointer flex items-center justify-center gap-2 sticky top-0 z-50 shadow-lg transition">
+  <div id="mic-perm-banner" onclick="initMicAndAudio()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2 px-3 text-center cursor-pointer flex items-center justify-center gap-2 sticky top-0 z-50 shadow transition">
     <i class="fa-solid fa-microphone-lines animate-pulse text-sm"></i>
     <span id="mic-status-label">TIK HIER OM MICROFOON & PORTO-AUDIO TE STARTEN</span>
   </div>
 
   <!-- MOBIELE TOPBAR -->
-  <header class="bg-slate-900 border-b border-slate-800 px-3 py-2 flex items-center justify-between sticky top-0 z-40">
+  <header class="bg-white border-b border-slate-200 px-3 py-2 flex items-center justify-between sticky top-0 z-40 shadow-sm">
     <div class="flex items-center gap-2">
-      <div id="conn-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400" title="Verbonden"></div>
-      <h1 class="text-xs font-black tracking-wide text-white">
+      <div id="conn-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500" title="Verbonden"></div>
+      <h1 class="text-xs font-black tracking-wide text-slate-900">
         C2000 LIVE PORTO
       </h1>
     </div>
 
     <div class="flex items-center gap-1.5">
-      <select id="channel-select" class="bg-slate-800 border border-slate-700 text-amber-300 font-bold text-xs rounded-lg px-2 py-1 focus:outline-none">
+      <select id="channel-select" class="bg-slate-100 border border-slate-300 text-amber-700 font-bold text-xs rounded-lg px-2 py-1 focus:outline-none">
         <!-- Vult DUO-01 t/m DUO-15 -->
       </select>
-      <button onclick="toggleUserRole()" id="role-toggle-btn" class="bg-slate-800 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-blue-400">
+      <button onclick="toggleUserRole()" id="role-toggle-btn" class="bg-slate-100 border border-slate-300 text-xs px-2 py-1 rounded-lg font-bold text-blue-700">
         🏃 Loper
       </button>
-      <button onclick="resetWholeDatabase()" title="Gehele database resetten" class="bg-red-950/70 border border-red-700/60 text-red-400 text-xs w-7 h-7 rounded-lg flex items-center justify-center">
+      <button onclick="resetWholeDatabase()" title="Gehele database resetten" class="bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 text-xs w-7 h-7 rounded-lg flex items-center justify-center transition">
         <i class="fa-solid fa-trash-can text-[11px]"></i>
       </button>
     </div>
@@ -67,8 +67,8 @@
          ========================================================================= -->
     <section id="tab-porto" class="tab-content space-y-3">
 
-      <!-- C2000 HANDHELD RADIO -->
-      <div class="bg-slate-900 rounded-3xl p-4 border-2 border-slate-700 shadow-2xl relative">
+      <!-- C2000 HANDHELD RADIO (Blijft authentiek donker als echt toestel) -->
+      <div class="bg-slate-900 text-slate-100 rounded-3xl p-4 border-2 border-slate-700 shadow-xl relative">
         <div class="w-3.5 h-7 bg-slate-700 absolute -top-7 left-8 rounded-t border-t border-slate-500"></div>
 
         <!-- Speaker grill -->
@@ -115,7 +115,7 @@
 
           <!-- SCHERM VOOR OC (STUDENT 2) -->
           <div id="view-oc" class="hidden space-y-2.5 pt-2 border-t border-slate-800">
-            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2">
+            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2 text-slate-100">
               <div class="flex justify-between items-center">
                 <span class="text-amber-400 font-bold text-[11px] flex items-center gap-1">
                   <i class="fa-solid fa-camera"></i> OC MELDING & BEWAKINGSBEELD
@@ -154,7 +154,7 @@
 
           <!-- SCHERM VOOR LOPER (STUDENT 1) -->
           <div id="view-loper" class="space-y-2 pt-1 border-t border-slate-800">
-            <div id="loper-mission-box" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-2">
+            <div id="loper-mission-box" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-2 text-slate-100">
               <div>
                 <span class="text-blue-400 font-bold block mb-0.5 text-[11px]"><i class="fa-solid fa-location-dot"></i> OPDRACHT VAN HET OC:</span>
                 <p id="loper-instruction" class="text-slate-300 text-[11px]">
@@ -172,14 +172,14 @@
       </div>
 
       <!-- Locaties in het gebouw -->
-      <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-800 text-[11px] text-slate-400">
-        <span class="font-bold text-slate-300 block mb-1"><i class="fa-solid fa-building text-blue-400"></i> Locaties in het gebouw:</span>
+      <div class="bg-white rounded-xl p-3 border border-slate-200 text-[11px] text-slate-700 shadow-sm">
+        <span class="font-bold text-slate-900 block mb-1"><i class="fa-solid fa-building text-blue-600"></i> Locaties in het gebouw:</span>
         <div class="grid grid-cols-1 gap-0.5 text-[10px]">
-          <div><strong class="text-blue-400">a:</strong> Onderwijsondersteuning (3e etage)</div>
-          <div><strong class="text-blue-400">b:</strong> Receptie (begane grond)</div>
-          <div><strong class="text-blue-400">c:</strong> Balie (2e etage)</div>
-          <div><strong class="text-blue-400">d:</strong> Hal voor klapdeuren docentenafdeling (5e etage)</div>
-          <div><strong class="text-blue-400">e:</strong> Ronde studieruimte (4e etage)</div>
+          <div><strong class="text-blue-600">a:</strong> Onderwijsondersteuning (3e etage)</div>
+          <div><strong class="text-blue-600">b:</strong> Receptie (begane grond)</div>
+          <div><strong class="text-blue-600">c:</strong> Balie (2e etage)</div>
+          <div><strong class="text-blue-600">d:</strong> Hal voor klapdeuren docentenafdeling (5e etage)</div>
+          <div><strong class="text-blue-600">e:</strong> Ronde studieruimte (4e etage)</div>
         </div>
       </div>
 
@@ -191,105 +191,115 @@
     <section id="tab-verhoor" class="tab-content hidden space-y-3">
       
       <!-- HET PROMINENTE CAMERABEELD VOOR DE LOPER -->
-      <div class="bg-slate-900 rounded-2xl p-3 border-2 border-emerald-500/60 shadow-xl space-y-2">
+      <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm space-y-2">
         <div class="flex justify-between items-center">
-          <span class="text-emerald-400 font-bold text-xs flex items-center gap-1.5">
+          <span class="text-emerald-700 font-bold text-xs flex items-center gap-1.5">
             <i class="fa-solid fa-video text-red-500 animate-pulse"></i> VEILIGGESTELD CAMERABEELD TER PLAATSE
           </span>
-          <span id="loper-cctv-loc-badge" class="text-[10px] bg-slate-800 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">LOC: BALIE</span>
+          <span id="loper-cctv-loc-badge" class="text-[10px] bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded font-mono font-bold">LOC: BALIE</span>
         </div>
 
-        <div id="loper-cctv-container" class="w-full flex justify-center bg-black rounded-xl overflow-hidden border border-slate-700 min-h-[180px] shadow-inner relative">
-          <div class="py-12 text-slate-500 text-xs italic">Geen camerabeeld geladen. Meld je eerst ter plaatse via de porto.</div>
+        <div id="loper-cctv-container" class="w-full flex justify-center bg-black rounded-xl overflow-hidden border border-slate-800 min-h-[180px] shadow-inner relative">
+          <div class="py-12 text-slate-400 text-xs italic">Geen camerabeeld geladen. Meld je eerst ter plaatse via de porto.</div>
         </div>
 
-        <p class="text-[10px] text-slate-400 text-center">
+        <p class="text-[10px] text-slate-500 text-center">
           Bestudeer het camerabeeld: vergelijk het met het verhoor hieronder en verwerk dit in de ASTMA-mutatie.
         </p>
       </div>
 
       <!-- Verhoor Status & Gouden W Teller -->
-      <div class="bg-slate-900 rounded-xl p-2.5 border border-slate-800 flex items-center justify-between">
+      <div class="bg-white rounded-xl p-2.5 border border-slate-200 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-500/50 flex items-center justify-center text-blue-300 text-sm">
+          <div class="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 text-sm">
             👤
           </div>
           <div>
-            <h2 id="bot-name-label" class="text-xs font-bold text-white">Geen verhoor actief</h2>
-            <p id="bot-role-label" class="text-[9px] text-amber-400 uppercase font-semibold">Ga eerst ter plaatse</p>
+            <h2 id="bot-name-label" class="text-xs font-bold text-slate-900">Geen verhoor actief</h2>
+            <p id="bot-role-label" class="text-[9px] text-amber-600 uppercase font-semibold">Ga eerst ter plaatse</p>
           </div>
         </div>
         <div class="text-right">
-          <div class="text-[9px] text-slate-400">Gouden W's:</div>
-          <div id="w-counter" class="text-xs font-black text-emerald-400 font-mono">0 / 7</div>
+          <div class="text-[9px] text-slate-500">Gouden W's:</div>
+          <div id="w-counter" class="text-xs font-black text-emerald-600 font-mono">0 / 7</div>
         </div>
       </div>
 
       <!-- Checklist Chips -->
-      <div class="flex flex-wrap gap-1 bg-slate-900/60 p-1.5 rounded-lg border border-slate-800 text-[9px] font-bold">
-        <span id="chip-wie" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WIE</span>
-        <span id="chip-wat" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WAT</span>
-        <span id="chip-waar" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WAAR</span>
-        <span id="chip-wanneer" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WANNEER</span>
-        <span id="chip-waarmee" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">WAARMEE</span>
-        <span id="chip-hoe" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">HOE</span>
-        <span id="chip-signalement" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700">SIGNALEMENT</span>
+      <div class="flex flex-wrap gap-1 bg-slate-200/70 p-1.5 rounded-lg border border-slate-300 text-[9px] font-bold">
+        <span id="chip-wie" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">WIE</span>
+        <span id="chip-wat" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">WAT</span>
+        <span id="chip-waar" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">WAAR</span>
+        <span id="chip-wanneer" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">WANNEER</span>
+        <span id="chip-waarmee" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">WAARMEE</span>
+        <span id="chip-hoe" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">HOE</span>
+        <span id="chip-signalement" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">SIGNALEMENT</span>
       </div>
 
       <!-- Chat Stream -->
-      <div id="chat-stream" class="bg-slate-900/90 rounded-2xl p-3 border border-slate-800 h-[220px] overflow-y-auto space-y-2 text-xs">
-        <div class="text-center py-12 text-slate-500 text-xs">
+      <div id="chat-stream" class="bg-white rounded-2xl p-3 border border-slate-200 h-[220px] overflow-y-auto space-y-2 text-xs shadow-inner">
+        <div class="text-center py-12 text-slate-400 text-xs">
           Druk op de Porto-tab op <strong>"Ik ben ter plaatse"</strong> om het camerabeeld en het verhoor te openen.
         </div>
       </div>
 
       <!-- Vraagknoppen -->
       <div class="flex flex-wrap gap-1">
-        <button onclick="askBotQuestion('wie')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">👤 Wie?</button>
-        <button onclick="askBotQuestion('wat')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">❓ Wat gebeurde er?</button>
-        <button onclick="askBotQuestion('waar')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">📍 Waar precies?</button>
-        <button onclick="askBotQuestion('wanneer')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">⏰ Wanneer?</button>
-        <button onclick="askBotQuestion('signalement')" class="bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 font-bold text-[11px] px-2 py-1.5 rounded-lg border border-blue-500/40">🔍 Bevestig Signalement</button>
-        <button onclick="askBotQuestion('waarmee')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">🔪 Waarmee?</button>
-        <button onclick="askBotQuestion('vlucht')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] px-2 py-1.5 rounded-lg border border-slate-700">🏃 Vluchtrichting?</button>
+        <button onclick="askBotQuestion('wie')" class="bg-white hover:bg-slate-100 text-slate-800 text-[11px] px-2 py-1.5 rounded-lg border border-slate-300 shadow-sm">👤 Wie?</button>
+        <button onclick="askBotQuestion('wat')" class="bg-white hover:bg-slate-100 text-slate-800 text-[11px] px-2 py-1.5 rounded-lg border border-slate-300 shadow-sm">❓ Wat gebeurde er?</button>
+        <button onclick="askBotQuestion('waar')" class="bg-white hover:bg-slate-100 text-slate-800 text-[11px] px-2 py-1.5 rounded-lg border border-slate-300 shadow-sm">📍 Waar precies?</button>
+        <button onclick="askBotQuestion('wanneer')" class="bg-white hover:bg-slate-100 text-slate-800 text-[11px] px-2 py-1.5 rounded-lg border border-slate-300 shadow-sm">⏰ Wanneer?</button>
+        <button onclick="askBotQuestion('signalement')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] px-2 py-1.5 rounded-lg border border-blue-300 shadow-sm">🔍 Bevestig Signalement</button>
+        <button onclick="askBotQuestion('waarmee')" class="bg-white hover:bg-slate-100 text-slate-800 text-[11px] px-2 py-1.5 rounded-lg border border-slate-300 shadow-sm">🔪 Waarmee?</button>
+        <button onclick="askBotQuestion('vlucht')" class="bg-white hover:bg-slate-100 text-slate-800 text-[11px] px-2 py-1.5 rounded-lg border border-slate-300 shadow-sm">🏃 Vluchtrichting?</button>
       </div>
     </section>
 
     <!-- =========================================================================
-         TAB 3: ASTMA MUTATIE MET FEEDFORWARD
+         TAB 3: ASTMA MUTATIE MET FEEDFORWARD & FEED-UP
          ========================================================================= -->
     <section id="tab-astma" class="tab-content hidden space-y-3">
 
-      <div class="bg-blue-950/40 rounded-xl p-2.5 border border-blue-600/40 text-xs">
-        <span class="font-bold text-blue-300 block mb-0.5"><i class="fa-solid fa-compass"></i> OPDRACHT IN DE ASTMA:</span>
-        <span class="text-slate-300 text-[11px]">
+      <div class="bg-blue-50 rounded-xl p-3 border border-blue-200 text-xs text-blue-950 shadow-sm">
+        <span class="font-bold text-blue-900 block mb-0.5"><i class="fa-solid fa-compass"></i> OPDRACHT IN DE ASTMA:</span>
+        <span class="text-blue-900/90 text-[11px]">
           Noteer in de <strong>A</strong> wat het OC meldde via de portofoon. Noteer in de <strong>T</strong> het ter plaatse vastgestelde signalement en of dit <u>overeenkomt met wat het OC over de porto heeft doorgegeven én het veiliggestelde camerabeeld</u>!
         </span>
       </div>
 
-      <form id="astma-form" onsubmit="handleMutationSubmit(event)" class="bg-slate-900 rounded-2xl p-3.5 border border-slate-800 space-y-2">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">A - Aanleiding (Melding OC via porto):</label>
-          <input type="text" id="input-a" required placeholder="Op verzoek van OC ter plaatse gegaan. Signalement volgens OC betrof..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">S - Situatie (Wat trof je aan op locatie?):</label>
-          <input type="text" id="input-s" required placeholder="Aldaar troffen wij melder/slachtoffer aan..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-amber-300 mb-0.5">T - Toedracht / Treffen (Signalement + vergelijking met camerabeeld & porto):</label>
-          <textarea id="input-t" rows="4" required placeholder="Aangetroffen persoon voldeed wel/niet aan het via de porto doorgegeven signalement en het veiliggestelde camerabeeld, te weten: Geslacht, leeftijd, kleding van boven naar beneden..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white font-mono text-base sm:text-xs"></textarea>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">M - Maatregel:</label>
-          <input type="text" id="input-m" required placeholder="Getuige gehoord, camerabeelden veiliggesteld in dossier..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">A - Afhandeling:</label>
-          <input type="text" id="input-afh" required placeholder="Slachtoffer opgevangen, mutatie opgemaakt..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+      <form id="astma-form" onsubmit="handleMutationSubmit(event)" class="bg-white rounded-2xl p-4 border border-slate-200 space-y-3 shadow-sm">
+
+        <!-- FEED-UP INVOER VAN DE LOPER -->
+        <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 space-y-1">
+          <label class="block text-[11px] font-bold text-amber-900">
+            🎯 Mijn Feed-up (Welk specifiek punt zorg ik voor dat dit keer NIET fout gaat?):
+          </label>
+          <input type="text" id="input-feedup" required placeholder="Bijv.: Ik let erop dat het signalement strikt van boven naar beneden loopt en zuiver in de T staat..." class="w-full bg-white border border-amber-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          <span class="text-[10px] text-amber-800 block">Jouw peer-reviewer zal hier straks specifiek feedback op geven.</span>
         </div>
 
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">A - Aanleiding (Melding OC via porto):</label>
+          <input type="text" id="input-a" required placeholder="Op verzoek van OC ter plaatse gegaan. Signalement volgens OC betrof..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:bg-white focus:outline-none focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">S - Situatie (Wat trof je aan op locatie?):</label>
+          <input type="text" id="input-s" required placeholder="Aldaar troffen wij melder/slachtoffer aan..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:bg-white focus:outline-none focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-amber-800 mb-0.5">T - Toedracht / Treffen (Signalement + vergelijking met camerabeeld & porto):</label>
+          <textarea id="input-t" rows="4" required placeholder="Aangetroffen persoon voldeed wel/niet aan het via de porto doorgegeven signalement en het veiliggestelde camerabeeld, te weten: Geslacht, leeftijd, kleding van boven naar beneden..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 font-mono text-base sm:text-xs focus:bg-white focus:outline-none focus:border-blue-500"></textarea>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">M - Maatregel:</label>
+          <input type="text" id="input-m" required placeholder="Getuige gehoord, camerabeelden veiliggesteld in dossier..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:bg-white focus:outline-none focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">A - Afhandeling:</label>
+          <input type="text" id="input-afh" required placeholder="Slachtoffer opgevangen, mutatie opgemaakt..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:bg-white focus:outline-none focus:border-blue-500">
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow transition">
           <i class="fa-solid fa-paper-plane"></i> Mutatie Indienen & Rollen Wisselen
         </button>
       </form>
@@ -300,8 +310,8 @@
          ========================================================================= -->
     <section id="tab-feed" class="tab-content hidden space-y-3">
       <div class="flex items-center justify-between">
-        <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Mutaties van de klas</h2>
-        <span id="feed-count" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold">0 ingediend</span>
+        <h2 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Mutaties van de klas</h2>
+        <span id="feed-count" class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-bold">0 ingediend</span>
       </div>
       <div id="feed-list" class="space-y-3"></div>
     </section>
@@ -309,56 +319,64 @@
   </main>
 
   <!-- PEER-FEEDBACK MODAL -->
-  <div id="feedback-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-4 space-y-2.5 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 class="text-xs font-bold text-white"><i class="fa-solid fa-comments text-blue-400 mr-1"></i> Peer-Feedback</h3>
-        <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark"></i></button>
+  <div id="feedback-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white border-t sm:border border-slate-200 rounded-t-3xl sm:rounded-2xl max-w-lg w-full p-4 space-y-2.5 shadow-2xl max-h-[90vh] overflow-y-auto text-slate-900">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+        <h3 class="text-xs font-bold text-slate-900"><i class="fa-solid fa-comments text-blue-600 mr-1"></i> Peer-Feedback</h3>
+        <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div id="feedback-preview-text" class="bg-slate-950 p-2.5 rounded-xl text-[11px] text-slate-300 font-mono border border-slate-800 max-h-24 overflow-y-auto"></div>
+      <div id="feedback-preview-text" class="bg-slate-100 p-2.5 rounded-xl text-[11px] text-slate-800 font-mono border border-slate-200 max-h-28 overflow-y-auto"></div>
 
       <form onsubmit="handlePeerFeedbackSubmit(event)" class="space-y-2 text-xs">
         <div>
-          <label class="block text-[11px] font-bold text-slate-300 mb-0.5">Klopt de overeenkomst met het porto-bericht & camerabeeld?</label>
-          <select id="fb-sig-score" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white">
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Is het gekozen Feed-up doel behaald?</label>
+          <select id="fb-feedup-score" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900">
+            <option value="🎯 Uitstekend behaald">🎯 Uitstekend: Feed-up punt goed toegepast</option>
+            <option value="⚠️ Deels behaald (aandachtspuntje)">⚠️ Deels behaald: Nog wat aandacht nodig</option>
+            <option value="❌ Niet behaald (toch fout gegaan)">❌ Niet behaald: Toch nog fout gegaan</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Klopt de overeenkomst met het porto-bericht & camerabeeld?</label>
+          <select id="fb-sig-score" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900">
             <option value="✅ Uitstekend (Duidelijk vergeleken met porto en camerabeeld)">✅ Uitstekend (Duidelijk vergeleken met porto & camerabeeld)</option>
             <option value="⚠️ Matig (Vergelijking met porto of camerabeeld ontbreekt)">⚠️ Matig (Vergelijking ontbreekt deels)</option>
             <option value="❌ Onvoldoende (Geen compleet signalement genoteerd)">❌ Onvoldoende (Geen compleet signalement)</option>
           </select>
         </div>
         <div>
-          <label class="block text-[11px] font-bold text-emerald-400 mb-0.5">TOP:</label>
-          <input type="text" id="fb-top-text" required placeholder="Wat was goed?" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+          <label class="block text-[11px] font-bold text-emerald-700 mb-0.5">TOP:</label>
+          <input type="text" id="fb-top-text" required placeholder="Wat was goed?" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs">
         </div>
         <div>
-          <label class="block text-[11px] font-bold text-amber-400 mb-0.5">TIP:</label>
-          <input type="text" id="fb-tip-text" required placeholder="Wat kan er beter?" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-white text-base sm:text-xs">
+          <label class="block text-[11px] font-bold text-amber-700 mb-0.5">TIP:</label>
+          <input type="text" id="fb-tip-text" required placeholder="Wat kan er beter?" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs">
         </div>
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-          <button type="button" onclick="closeFeedbackModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 text-xs">Annuleren</button>
-          <button type="submit" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white">Opslaan</button>
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+          <button type="button" onclick="closeFeedbackModal()" class="px-3 py-1.5 rounded-xl bg-slate-200 text-slate-700 text-xs font-semibold">Annuleren</button>
+          <button type="submit" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white shadow">Opslaan</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- VASTE NAVIGATIE ONDERAAN -->
-  <nav class="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur border-t border-slate-800 z-40 px-2 py-1 flex justify-around">
-    <button onclick="navigateToTab('porto')" id="nav-porto" class="flex flex-col items-center py-1 px-3 rounded-xl text-blue-400 font-bold transition">
+  <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-slate-200 z-40 px-2 py-1 flex justify-around shadow-lg">
+    <button onclick="navigateToTab('porto')" id="nav-porto" class="flex flex-col items-center py-1 px-3 rounded-xl text-blue-600 font-bold transition">
       <i class="fa-solid fa-walkie-talkie text-base"></i>
       <span class="text-[10px] mt-0.5">Porto</span>
     </button>
-    <button onclick="navigateToTab('verhoor')" id="nav-verhoor" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition relative">
+    <button onclick="navigateToTab('verhoor')" id="nav-verhoor" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-500 font-medium transition relative">
       <i class="fa-solid fa-video text-base"></i>
       <span class="text-[10px] mt-0.5">Camerabeeld & Chat</span>
-      <span id="chat-notification-dot" class="w-2 h-2 rounded-full bg-emerald-400 absolute top-1 right-3 hidden"></span>
+      <span id="chat-notification-dot" class="w-2 h-2 rounded-full bg-emerald-500 absolute top-1 right-3 hidden"></span>
     </button>
-    <button onclick="navigateToTab('astma')" id="nav-astma" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition">
+    <button onclick="navigateToTab('astma')" id="nav-astma" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-500 font-medium transition">
       <i class="fa-solid fa-pen-to-square text-base"></i>
       <span class="text-[10px] mt-0.5">ASTMA</span>
     </button>
-    <button onclick="navigateToTab('feed')" id="nav-feed" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition">
+    <button onclick="navigateToTab('feed')" id="nav-feed" class="flex flex-col items-center py-1 px-3 rounded-xl text-slate-500 font-medium transition">
       <i class="fa-solid fa-tower-broadcast text-base"></i>
       <span class="text-[10px] mt-0.5">Feed</span>
     </button>
@@ -847,11 +865,11 @@
       const chatBox = document.getElementById('chat-stream');
       chatBox.innerHTML = `
         <div class="flex gap-2 items-start">
-          <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs flex-shrink-0">
+          <div class="w-7 h-7 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs flex-shrink-0">
             👤
           </div>
-          <div class="chat-bubble-bot p-2.5 text-slate-200 text-xs shadow leading-relaxed max-w-[85%]">
-            <span class="text-[10px] font-bold text-amber-400 block mb-0.5">${c.personage}:</span>
+          <div class="chat-bubble-bot p-2.5 text-xs shadow leading-relaxed max-w-[85%]">
+            <span class="text-[10px] font-bold text-amber-700 block mb-0.5">${c.personage}:</span>
             "${c.greeting}"
           </div>
         </div>
@@ -901,9 +919,9 @@
       const div = document.createElement('div');
       div.className = "flex gap-2 items-start";
       div.innerHTML = `
-        <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs flex-shrink-0">👤</div>
-        <div class="chat-bubble-bot p-2.5 text-slate-200 text-xs max-w-[85%]">
-          <span class="text-[10px] font-bold text-amber-400 block mb-0.5">${activeCase.personage}:</span>
+        <div class="w-7 h-7 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs flex-shrink-0">👤</div>
+        <div class="chat-bubble-bot p-2.5 text-xs max-w-[85%]">
+          <span class="text-[10px] font-bold text-amber-700 block mb-0.5">${activeCase.personage}:</span>
           "${msg}"
         </div>
       `;
@@ -917,10 +935,10 @@
       keys.forEach(k => {
         const chip = document.getElementById(`chip-${k}`);
         if (discoveredW.has(k)) {
-          chip.className = "px-1.5 py-0.5 rounded bg-emerald-600/40 text-emerald-300 border border-emerald-500/60";
+          chip.className = "px-1.5 py-0.5 rounded bg-emerald-600 text-white border border-emerald-600";
           count++;
         } else {
-          chip.className = "px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 border border-slate-700";
+          chip.className = "px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300";
         }
       });
       document.getElementById('w-counter').textContent = `${count} / 7`;
@@ -1127,13 +1145,13 @@
 
       if (currentRole === 'oc') {
         btn.textContent = '🎧 OC';
-        btn.className = 'bg-slate-800 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-amber-400';
+        btn.className = 'bg-slate-100 border border-slate-300 text-xs px-2 py-1 rounded-lg font-bold text-amber-700';
         vOc.classList.remove('hidden');
         vLoper.classList.add('hidden');
         lcdRole.textContent = 'ROL: OC';
       } else {
         btn.textContent = '🏃 Loper';
-        btn.className = 'bg-slate-800 border border-slate-700 text-xs px-2 py-1 rounded-lg font-bold text-blue-400';
+        btn.className = 'bg-slate-100 border border-slate-300 text-xs px-2 py-1 rounded-lg font-bold text-blue-700';
         vOc.classList.add('hidden');
         vLoper.classList.remove('hidden');
         lcdRole.textContent = 'ROL: LOPER';
@@ -1148,9 +1166,9 @@
       tabs.forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
         if (t === tabName) {
-          btn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-blue-400 font-bold transition";
+          btn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-blue-600 font-bold transition";
         } else {
-          btn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-slate-400 font-medium transition";
+          btn.className = "flex flex-col items-center py-1 px-3 rounded-xl text-slate-500 font-medium transition";
         }
       });
 
@@ -1160,11 +1178,12 @@
     }
 
     /* =========================================================================
-       8. ASTMA FORMULIER VERSTUREN (GEÏSOLEERD, GEEFT GEEN HINDER VOOR MEDESTUDENTEN)
+       8. ASTMA FORMULIER VERSTUREN (MET FEED-UP DOEL VAN DE LOPER)
        ========================================================================= */
     function handleMutationSubmit(e) {
       e.preventDefault();
 
+      const feedup = document.getElementById('input-feedup').value.trim();
       const a = document.getElementById('input-a').value.trim();
       const s = document.getElementById('input-s').value.trim();
       const t = document.getElementById('input-t').value.trim();
@@ -1177,6 +1196,7 @@
         caseTitle: activeCase ? activeCase.titel : 'Eigen casus',
         location: activeCase ? activeCase.locatie.name : 'Gebouw',
         authorRole: currentRole,
+        feedup: feedup, // <--- Slaat het feed-up doel van de student op!
         astma: { a, s, t, m, afh },
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         feedbacks: []
@@ -1233,7 +1253,7 @@
     }
 
     /* =========================================================================
-       10. LIVEFEED & PEER-FEEDBACK (ALLEEN FEED-LIJST WORDT BIJGEWERKT)
+       10. LIVEFEED & PEER-FEEDBACK (MET FEED-UP BEOORDELING)
        ========================================================================= */
     let cachedFeed = [];
     db.ref(`${DB_ROOT}/mutations`).on('value', snap => {
@@ -1256,44 +1276,56 @@
       document.getElementById('feed-count').textContent = `${list.length} ingediend`;
 
       if (list.length === 0) {
-        box.innerHTML = `<div class="text-center py-10 text-slate-500 text-xs">Nog geen mutaties ingediend.</div>`;
+        box.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs">Nog geen mutaties ingediend.</div>`;
         return;
       }
 
       box.innerHTML = list.slice().reverse().map(m => {
         const fbHtml = (m.feedbacks && m.feedbacks.length > 0)
           ? m.feedbacks.map(f => `
-            <div class="bg-slate-950 p-2 rounded-lg border-l-2 border-emerald-500 text-[11px] space-y-0.5">
-              <div class="flex justify-between font-bold text-slate-300 text-[10px]">
+            <div class="bg-slate-50 p-2 rounded-lg border-l-2 border-emerald-500 text-[11px] space-y-0.5 border border-slate-200">
+              <div class="flex justify-between font-bold text-slate-700 text-[10px]">
                 <span>Reviewer: ${f.reviewer}</span>
-                <span class="text-slate-500">${f.time}</span>
+                <span class="text-slate-400">${f.time}</span>
               </div>
-              <div class="text-slate-400">${f.sigScore}</div>
-              <div class="text-emerald-400 font-medium">Top: ${f.top}</div>
-              <div class="text-amber-400 font-medium">Tip: ${f.tip}</div>
+              ${f.feedupScore ? `<div class="text-amber-800 font-semibold">Feed-up: ${f.feedupScore}</div>` : ''}
+              <div class="text-slate-600">${f.sigScore}</div>
+              <div class="text-emerald-700 font-medium">Top: ${f.top}</div>
+              <div class="text-amber-700 font-medium">Tip: ${f.tip}</div>
             </div>
           `).join('')
-          : `<p class="text-slate-500 text-[10px] italic">Nog geen peer-feedback ontvangen.</p>`;
+          : `<p class="text-slate-400 text-[10px] italic">Nog geen peer-feedback ontvangen.</p>`;
 
         return `
-          <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 space-y-2 shadow">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
-              <span class="text-[11px] font-black bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">${m.duo}</span>
-              <span class="text-xs font-bold text-white">${m.caseTitle}</span>
-              <span class="text-[10px] text-slate-500 font-mono">${m.timestamp}</span>
+          <div class="bg-white rounded-xl p-3 border border-slate-200 space-y-2 shadow-sm text-slate-800">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
+              <span class="text-[11px] font-black bg-blue-100 text-blue-700 px-2 py-0.5 rounded border border-blue-200">${m.duo}</span>
+              <span class="text-xs font-bold text-slate-900">${m.caseTitle}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${m.timestamp}</span>
             </div>
 
-            <div class="bg-slate-950 p-2 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-300 space-y-1">
-              <div><strong class="text-blue-400">A:</strong> ${m.astma.a}</div>
-              <div><strong class="text-blue-400">S:</strong> ${m.astma.s}</div>
-              <div class="bg-amber-950/20 pl-1 border-l border-amber-500/50"><strong class="text-amber-300">T:</strong> ${m.astma.t}</div>
-              <div><strong class="text-blue-400">M:</strong> ${m.astma.m}</div>
-              <div><strong class="text-blue-400">A:</strong> ${m.astma.afh}</div>
+            <!-- FEED-UP PUNT WEERGAVE -->
+            ${m.feedup ? `
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs text-amber-950 flex items-start gap-1.5">
+                <span class="text-base leading-none">🎯</span>
+                <div>
+                  <strong class="font-bold text-amber-900 text-[11px]">Gekozen Feed-up punt van ${m.duo}:</strong>
+                  <div class="text-slate-800 mt-0.5 text-[11px]">${m.feedup}</div>
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 text-[11px] font-mono text-slate-700 space-y-1">
+              <div><strong class="text-blue-700">A:</strong> ${m.astma.a}</div>
+              <div><strong class="text-blue-700">S:</strong> ${m.astma.s}</div>
+              <div class="bg-amber-50/70 pl-1 border-l border-amber-400"><strong class="text-amber-800">T:</strong> ${m.astma.t}</div>
+              <div><strong class="text-blue-700">M:</strong> ${m.astma.m}</div>
+              <div><strong class="text-blue-700">A:</strong> ${m.astma.afh}</div>
             </div>
 
-            <div class="flex justify-between items-center pt-1 border-t border-slate-800">
-              <span class="text-[10px] font-bold text-slate-400">Peer Reviews (${m.feedbacks ? m.feedbacks.length : 0})</span>
-              <button onclick="openFeedbackModal('${m.id}')" class="bg-slate-800 hover:bg-slate-700 text-blue-300 text-[11px] px-2.5 py-1 rounded-lg border border-slate-700">
+            <div class="flex justify-between items-center pt-1 border-t border-slate-100">
+              <span class="text-[10px] font-bold text-slate-500">Peer Reviews (${m.feedbacks ? m.feedbacks.length : 0})</span>
+              <button onclick="openFeedbackModal('${m.id}')" class="bg-slate-100 hover:bg-slate-200 text-blue-700 text-[11px] px-2.5 py-1 rounded-lg border border-slate-300 font-medium transition">
                 <i class="fa-solid fa-plus text-[10px]"></i> Reviewen
               </button>
             </div>
@@ -1311,7 +1343,8 @@
 
       document.getElementById('feedback-preview-text').innerHTML = `
         <strong>${target.duo} - ${target.caseTitle}</strong><br>
-        <span class="text-amber-300">T:</span> ${target.astma.t}
+        ${target.feedup ? `<div class="bg-amber-50 p-1.5 rounded my-1 text-amber-900 font-sans border border-amber-200"><strong>🎯 Gekozen Feed-up doel:</strong> "${target.feedup}"</div>` : ''}
+        <span class="text-slate-700"><strong>T:</strong> ${target.astma.t}</span>
       `;
       document.getElementById('feedback-modal').classList.remove('hidden');
     }
@@ -1327,6 +1360,7 @@
 
       const fb = {
         reviewer: currentDuo,
+        feedupScore: document.getElementById('fb-feedup-score').value,
         sigScore: document.getElementById('fb-sig-score').value,
         top: document.getElementById('fb-top-text').value.trim(),
         tip: document.getElementById('fb-tip-text').value.trim(),
