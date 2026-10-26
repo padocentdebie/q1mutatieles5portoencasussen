@@ -1201,8 +1201,14 @@
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') await audioCtx.resume();
 
-
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Audio constraints geoptimaliseerd: echo-cancellation aan, noiseSuppression uit zodat de stem niet afkapt
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: false,
+            autoGainControl: true
+          }
+        });
         
         document.getElementById('mic-perm-banner').classList.add('hidden');
         document.getElementById('mic-status-label').textContent = "MICROFOON ACTIEF";
@@ -1225,12 +1231,12 @@
         osc.type = 'sine';
         osc.frequency.setValueAtTime(920, now);
         osc.frequency.setValueAtTime(1250, now + 0.08);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start(now);
-        osc.stop(now + 0.22);
+        osc.stop(now + 0.18);
       } catch(e) {}
     }
 
@@ -1238,7 +1244,7 @@
     function playSquelchNoise() {
       try {
         if (!audioCtx) return;
-        const duration = 0.12;
+        const duration = 0.10;
         const bufferSize = audioCtx.sampleRate * duration;
         const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const data = buffer.getChannelData(0);
@@ -1254,7 +1260,7 @@
 
 
         const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
 
 
@@ -1286,7 +1292,6 @@
         if (!micStream) return;
       }
 
-
       isRecording = true;
       audioChunks = [];
 
@@ -1303,21 +1308,27 @@
       if (stat1) stat1.textContent = "● TX (ZENDEN)";
       if (stat2) stat2.textContent = "● TX (ZENDEN)";
 
-
       playRadioChirp();
 
-
-      try {
-        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-        mediaRecorder = new MediaRecorder(micStream, { mimeType });
-        mediaRecorder.ondataavailable = (e) => {
-          if (e.data.size > 0) audioChunks.push(e.data);
-        };
-        mediaRecorder.onstop = uploadVoiceMessage;
-        mediaRecorder.start();
-      } catch (err) {
-        console.error("Opnamefout:", err);
-      }
+      // Wacht heel even (180ms) zodat de chirp klaar is voordat de recorder start
+      // Hierdoor wordt het begin van de zin NOOIT gedempt door de echo-onderdrukking!
+      setTimeout(() => {
+        if (!isRecording) return;
+        try {
+          const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
+            ? 'audio/webm;codecs=opus' 
+            : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4');
+          
+          mediaRecorder = new MediaRecorder(micStream, { mimeType });
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) audioChunks.push(e.data);
+          };
+          mediaRecorder.onstop = uploadVoiceMessage;
+          mediaRecorder.start(100); // 100ms chunks zorgen voor soepele streaming
+        } catch (err) {
+          console.error("Opnamefout:", err);
+        }
+      }, 180);
     }
 
 
@@ -1338,19 +1349,20 @@
       if (stat1) stat1.textContent = "● STAND-BY";
       if (stat2) stat2.textContent = "● STAND-BY";
 
-
       playSquelchNoise();
 
-
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-      }
+      // Geef de encoder 200ms uitlooptijd zodat het laatste woord NOOIT afgekapt wordt!
+      setTimeout(() => {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+      }, 200);
     }
 
 
     function uploadVoiceMessage() {
       if (audioChunks.length === 0) return;
-      const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+      const blob = new Blob(audioChunks, { type: mediaRecorder ? mediaRecorder.mimeType : 'audio/webm' });
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = () => {
@@ -1365,27 +1377,39 @@
 
     function playIncomingVoice(base64Audio) {
       playRadioChirp();
+      
       setTimeout(() => {
         const audio = new Audio(base64Audio);
+        
+        // C2000 Bandpass filter met correcte radiodoorlaat (300Hz - 3400Hz)
+        // Zo behoud je het porto-effect ZONDER dat klinkers wegvallen of stotteren!
         if (audioCtx) {
           try {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             const source = audioCtx.createMediaElementSource(audio);
-            const bandpass = audioCtx.createBiquadFilter();
-            bandpass.type = 'bandpass';
-            bandpass.frequency.value = 1600;
-            bandpass.Q.value = 1.2;
-            source.connect(bandpass);
-            bandpass.connect(audioCtx.destination);
-          } catch(e) {}
-        }
+            
+            const highpass = audioCtx.createBiquadFilter();
+            highpass.type = 'highpass';
+            highpass.frequency.value = 300; // Filtert onnodig diepe bas weg
 
+            const lowpass = audioCtx.createBiquadFilter();
+            lowpass.type = 'lowpass';
+            lowpass.frequency.value = 3400; // Authentiek communicatie-bereik
+            
+            source.connect(highpass);
+            highpass.connect(lowpass);
+            lowpass.connect(audioCtx.destination);
+          } catch(e) {
+            // Fallback: directe audio playback indien Web Audio node al gekoppeld was
+          }
+        }
 
         const stat1 = document.getElementById('lcd-status-label');
         const stat2 = document.getElementById('lcd-status-label-verhoor');
         if (stat1) stat1.textContent = "● RX (SPRAAK)";
         if (stat2) stat2.textContent = "● RX (SPRAAK)";
-        document.getElementById('lcd-main-title').textContent = "INVOICE ONTVANGEN";
-
+        document.getElementById('lcd-main-title').textContent = "BERICHT ONTVANGEN";
 
         audio.play().catch(e => console.log("Autoplay geblokkeerd:", e));
         audio.onended = () => {
@@ -1394,7 +1418,7 @@
           if (stat2) stat2.textContent = "● STAND-BY";
           document.getElementById('lcd-main-title').textContent = "KANAAL OPEN";
         };
-      }, 250);
+      }, 200);
     }
 
 
@@ -1559,6 +1583,10 @@
        9. REALTIME LISTENERS: LOCATIE EN OPDRACHT ONTVANGEN (SIGNALEMENT VIA PORTO)
        ========================================================================= */
     function listenForDuoData() {
+      // Vorige listeners uitschakelen om dubbele audio / echo's te voorkomen
+      db.ref(`${currentDuo}/voiceMsg`).off();
+      db.ref(`${currentDuo}/mission`).off();
+
       // Voice listener
       db.ref(`${currentDuo}/voiceMsg`).on('value', snap => {
         const data = snap.val();
