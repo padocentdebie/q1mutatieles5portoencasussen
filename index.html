@@ -932,17 +932,62 @@
 
 
     /* =========================================================================
-       3. WEERGAVE VOOR CASUSAFBEELDINGEN (CASUS1.PNG / CASUS1B.PNG + FALLBACK)
+       3. WEERGAVE VOOR CASUSAFBEELDINGEN (CASUS*.PNG / CASUS*B.PNG + FALLBACK)
        ========================================================================= */
+    function handleCaseImgError(img, id, isB) {
+      if (!img.dataset.tryStep) img.dataset.tryStep = "0";
+      let step = parseInt(img.dataset.tryStep, 10);
+
+      const candidates = isB ? [
+        `casus${id}b.png`,
+        `casus${id}B.png`,
+        `img/casus${id}b.png`,
+        `img/casus${id}B.png`,
+        `casus${id}.b.png`,
+        `img/casus${id}.b.png`,
+        `casus${id}-b.png`,
+        `img/casus${id}-b.png`,
+        `casus${id}b.jpg`,
+        `casus${id}B.jpg`,
+        `img/casus${id}b.jpg`,
+        `img/casus${id}B.jpg`
+      ] : [
+        `casus${id}.png`,
+        `img/casus${id}.png`,
+        `casus${id}a.png`,
+        `casus${id}A.png`,
+        `img/casus${id}a.png`,
+        `img/casus${id}A.png`,
+        `casus${id}.jpg`,
+        `img/casus${id}.jpg`
+      ];
+
+      while (step < candidates.length) {
+        const nextSrc = candidates[step];
+        step++;
+        img.dataset.tryStep = step.toString();
+        if (!img.src.endsWith(nextSrc)) {
+          img.src = nextSrc;
+          return;
+        }
+      }
+
+      // Pas als geen enkel afbeeldingsbestand gevonden kan worden, volgt het schematische figuur
+      img.onerror = null;
+      if (img.parentElement) {
+        img.parentElement.innerHTML = renderSVGGraphic(id, isB);
+      }
+    }
+
     function renderCaseImageHTML(c, cssClass = "w-full max-w-[280px]", isB = false) {
-      const pngPath = isB ? `casus${c.id}B.png` : `casus${c.id}.png`;
+      const pngPath = isB ? `casus${c.id}b.png` : `casus${c.id}.png`;
       const badgeText = isB ? `${c.badge} (B)` : c.badge;
       return `
         <div class="relative ${cssClass} rounded-xl overflow-hidden border border-slate-700 bg-black shadow-inner flex justify-center items-center">
           <img src="${pngPath}" 
                alt="${c.titel}" 
                class="w-full h-auto object-cover block"
-               onerror="if(!this.dataset.triedImg){this.dataset.triedImg=1;this.src='img/${pngPath}';}else{this.onerror=null;this.parentElement.innerHTML=renderSVGGraphic(${c.id}, ${isB});}" />
+               onerror="handleCaseImgError(this, ${c.id}, ${isB})" />
           <!-- CCTV Scanlines & Overlay -->
           <div class="absolute inset-0 scanlines pointer-events-none opacity-30"></div>
           <div class="absolute top-0 inset-x-0 bg-black/75 px-2 py-0.5 flex justify-between items-center text-[9px] font-mono text-white">
