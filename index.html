@@ -25,18 +25,77 @@
     .chat-bubble-bot { background-color: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 1rem 1rem 1rem 0.2rem; }
     .chat-bubble-user { background-color: #2563eb; color: #ffffff; border-radius: 1rem 1rem 0.2rem 1rem; }
     .scanlines {
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.06));
       background-size: 100% 3px, 4px 100%;
     }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-24 font-sans select-none antialiased">
 
+  <!-- =========================================================================
+       INLOG- EN INSTRUCTIESCHERM (STARTMODAL)
+       ========================================================================= -->
+  <div id="login-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4 max-h-[95vh] overflow-y-auto">
+      
+      <div class="text-center space-y-1">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 text-2xl font-black mb-1 shadow">
+          <i class="fa-solid fa-walkie-talkie"></i>
+        </div>
+        <h2 class="text-base font-black text-slate-900 tracking-wide uppercase">C2000 Porto & Signalement Training</h2>
+        <p class="text-xs text-slate-500 font-medium">Kies je Duo en je rol om de training te starten</p>
+      </div>
+
+      <!-- UITLEG OPDRACHT -->
+      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-3 text-xs text-blue-950 space-y-2 leading-relaxed">
+        <span class="font-bold text-blue-900 block text-xs uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-info text-blue-600"></i> Spelregels & Instructie:
+        </span>
+        <ul class="space-y-1.5 text-[11px] text-slate-700 list-disc list-inside">
+          <li><strong>Kies een Duo per klas:</strong> Elk duo werkt samen op een eigen C2000-portokanaal.</li>
+          <li><strong>Verdeel de rollen:</strong> Elk duo kiest een <strong>OC'er</strong> (Meldkamer) en een <strong>Rapporteur</strong>.</li>
+          <li><strong>De OC</strong> stuurt de rapporteur ter plaatse met in de melding een signalement van de persoon waar de rapporteur wat moet.</li>
+          <li><strong>Ter plaatse</strong> krijgt de rapporteur een keuze uit <u>twee personen met een vrijwel identiek signalement</u>. De rapporteur kiest aan de hand van het signalement dat hij van de OC'er krijgt met wie hij in gesprek gaat.</li>
+          <li><strong class="text-red-600">Let op:</strong> Een verkeerde keuze van de rapporteur wordt direct voor alle ingelogden zichtbaar in de livefeed!</li>
+        </ul>
+      </div>
+
+      <!-- KEUZEFORMULIER -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">1. Kies jouw DUO (Porto-kanaal):</label>
+          <select id="login-duo-select" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-bold text-amber-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <!-- Vult DUO-01 t/m DUO-15 -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">2. Kies jouw rol binnen het duo:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="login-btn-rapporteur" onclick="selectLoginRole('rapporteur')" class="py-2.5 px-3 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold text-xs flex items-center justify-center gap-2 transition">
+              🏃 Rapporteur
+            </button>
+            <button type="button" id="login-btn-oc" onclick="selectLoginRole('oc')" class="py-2.5 px-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-xs flex items-center justify-center gap-2 transition">
+              🎧 OC (Meldkamer)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="confirmLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition">
+        <i class="fa-solid fa-play"></i> Inloggen & Starten
+      </button>
+
+    </div>
+  </div>
+
+
   <!-- ACTIVATIE BANNER VOOR MICROFOON & AUDIO -->
   <div id="mic-perm-banner" onclick="initMicAndAudio()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs py-2 px-3 text-center cursor-pointer flex items-center justify-center gap-2 sticky top-0 z-50 shadow transition">
     <i class="fa-solid fa-microphone-lines animate-pulse text-sm"></i>
     <span id="mic-status-label">TIK HIER OM MICROFOON & PORTO-AUDIO TE STARTEN</span>
   </div>
+
 
   <!-- MOBIELE TOPBAR -->
   <header class="bg-white border-b border-slate-200 px-3 py-2 flex items-center justify-between sticky top-0 z-40 shadow-sm">
@@ -47,12 +106,13 @@
       </h1>
     </div>
 
+
     <div class="flex items-center gap-1.5">
       <select id="channel-select" class="bg-slate-100 border border-slate-300 text-amber-700 font-bold text-xs rounded-lg px-2 py-1 focus:outline-none">
         <!-- Vult DUO-01 t/m DUO-15 -->
       </select>
       <button onclick="toggleUserRole()" id="role-toggle-btn" class="bg-slate-100 border border-slate-300 text-xs px-2 py-1 rounded-lg font-bold text-blue-700">
-        🏃 Loper
+        🏃 Rapporteur
       </button>
       <button onclick="resetWholeDatabase()" title="Gehele database resetten" class="bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 text-xs w-7 h-7 rounded-lg flex items-center justify-center transition">
         <i class="fa-solid fa-trash-can text-[11px]"></i>
@@ -60,16 +120,20 @@
     </div>
   </header>
 
+
   <main class="max-w-md mx-auto px-3 pt-3">
+
 
     <!-- =========================================================================
          TAB 1: DE PORTOFOON & OC MELDING
          ========================================================================= -->
     <section id="tab-porto" class="tab-content space-y-3">
 
+
       <!-- C2000 HANDHELD RADIO (Blijft authentiek donker als echt toestel) -->
       <div class="bg-slate-900 text-slate-100 rounded-3xl p-4 border-2 border-slate-700 shadow-xl relative">
         <div class="w-3.5 h-7 bg-slate-700 absolute -top-7 left-8 rounded-t border-t border-slate-500"></div>
+
 
         <!-- Speaker grill -->
         <div class="flex justify-center gap-1 mb-2">
@@ -77,6 +141,7 @@
           <div class="w-12 h-1 bg-slate-800 rounded-full"></div>
           <div class="w-8 h-1 bg-slate-800 rounded-full"></div>
         </div>
+
 
         <!-- LCD Scherm -->
         <div class="lcd-screen rounded-xl p-3 mb-3 border-2 border-slate-600 shadow-inner flex flex-col justify-between min-h-[125px]">
@@ -93,10 +158,11 @@
             </div>
           </div>
           <div class="flex justify-between items-center text-[9px] pt-1 border-t border-slate-900/20 font-bold">
-            <span id="lcd-role-label">ROL: LOPER</span>
+            <span id="lcd-role-label">ROL: RAPPORTEUR</span>
             <span id="lcd-loc-tag">LOC: GEEN</span>
           </div>
         </div>
+
 
         <!-- BEDIENING & PTT -->
         <div class="space-y-2.5">
@@ -113,6 +179,7 @@
             </div>
           </div>
 
+
           <!-- SCHERM VOOR OC (STUDENT 2) -->
           <div id="view-oc" class="hidden space-y-2.5 pt-2 border-t border-slate-800">
             <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2 text-slate-100">
@@ -125,12 +192,15 @@
                 </button>
               </div>
 
+
               <!-- AFBEELDING OC -->
               <div id="oc-photo-container" class="w-full rounded-xl overflow-hidden border border-slate-700 shadow-inner bg-slate-900 flex justify-center">
                 <div class="py-8 text-slate-500 text-xs italic">Druk op 'Nieuw Incident' om de melding en foto op te halen.</div>
               </div>
 
+
               <div id="oc-case-details" class="text-xs space-y-1"></div>
+
 
               <!-- PORTO VOORLEES-INSTRUCTIE VOOR HET OC -->
               <div id="oc-speech-prompt" class="hidden bg-amber-950/30 p-2.5 rounded-xl border border-amber-600/40 text-[11px] space-y-1 text-slate-200">
@@ -140,6 +210,7 @@
                 <p id="oc-speech-text" class="italic text-slate-300 font-mono text-[10px]"></p>
               </div>
 
+
               <!-- BEVESTIGINGSKNOP VOOR HET OC -->
               <button id="btn-confirm-signalement" onclick="confirmSignalementByOC()" disabled class="w-full bg-slate-800 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                 <i class="fa-solid fa-check-double text-emerald-400"></i>
@@ -147,12 +218,14 @@
               </button>
             </div>
 
+
             <button id="btn-dispatch-loper" onclick="broadcastCaseToPartner()" disabled class="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
-              <i class="fa-solid fa-paper-plane"></i> 2. Stuur Opdracht Naar Loper
+              <i class="fa-solid fa-paper-plane"></i> 2. Stuur Opdracht Naar Rapporteur
             </button>
           </div>
 
-          <!-- SCHERM VOOR LOPER (STUDENT 1) -->
+
+          <!-- SCHERM VOOR RAPPORTEUR (STUDENT 1) -->
           <div id="view-loper" class="space-y-2 pt-1 border-t border-slate-800">
             <div id="loper-mission-box" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-2 text-slate-100">
               <div>
@@ -163,13 +236,16 @@
               </div>
             </div>
 
+
             <button id="btn-arrived" onclick="unitArrivedAtScene()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
               <i class="fa-solid fa-flag-checkered text-base"></i> 📍 Ik ben ter plaatse / Ik ben er
             </button>
           </div>
 
+
         </div>
       </div>
+
 
       <!-- Locaties in het gebouw -->
       <div class="bg-white rounded-xl p-3 border border-slate-200 text-[11px] text-slate-700 shadow-sm">
@@ -183,14 +259,16 @@
         </div>
       </div>
 
+
     </section>
 
+
     <!-- =========================================================================
-         TAB 2: VERHOOR & VOLWAARDIG CAMERABEELD VOOR DE LOPER
+         TAB 2: VERHOOR & VOLWAARDIG CAMERABEELD VOOR DE RAPPORTEUR
          ========================================================================= -->
     <section id="tab-verhoor" class="tab-content hidden space-y-3">
       
-      <!-- HET PROMINENTE CAMERABEELD VOOR DE LOPER -->
+      <!-- HET PROMINENTE CAMERABEELD VOOR DE RAPPORTEUR -->
       <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm space-y-2">
         <div class="flex justify-between items-center">
           <span class="text-emerald-700 font-bold text-xs flex items-center gap-1.5">
@@ -199,14 +277,17 @@
           <span id="loper-cctv-loc-badge" class="text-[10px] bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded font-mono font-bold">LOC: BALIE</span>
         </div>
 
+
         <div id="loper-cctv-container" class="w-full flex justify-center bg-black rounded-xl overflow-hidden border border-slate-800 min-h-[180px] shadow-inner relative">
           <div class="py-12 text-slate-400 text-xs italic">Geen camerabeeld geladen. Meld je eerst ter plaatse via de porto.</div>
         </div>
+
 
         <p class="text-[10px] text-slate-500 text-center">
           Bestudeer het camerabeeld: vergelijk het met het verhoor hieronder en verwerk dit in de ASTMA-mutatie.
         </p>
       </div>
+
 
       <!-- Verhoor Status & Gouden W Teller -->
       <div class="bg-white rounded-xl p-2.5 border border-slate-200 flex items-center justify-between shadow-sm">
@@ -225,6 +306,7 @@
         </div>
       </div>
 
+
       <!-- Checklist Chips -->
       <div class="flex flex-wrap gap-1 bg-slate-200/70 p-1.5 rounded-lg border border-slate-300 text-[9px] font-bold">
         <span id="chip-wie" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">WIE</span>
@@ -236,12 +318,14 @@
         <span id="chip-signalement" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">SIGNALEMENT</span>
       </div>
 
+
       <!-- Chat Stream -->
       <div id="chat-stream" class="bg-white rounded-2xl p-3 border border-slate-200 h-[220px] overflow-y-auto space-y-2 text-xs shadow-inner">
         <div class="text-center py-12 text-slate-400 text-xs">
           Druk op de Porto-tab op <strong>"Ik ben ter plaatse"</strong> om het camerabeeld en het verhoor te openen.
         </div>
       </div>
+
 
       <!-- Vraagknoppen -->
       <div class="flex flex-wrap gap-1">
@@ -255,10 +339,12 @@
       </div>
     </section>
 
+
     <!-- =========================================================================
          TAB 3: ASTMA MUTATIE MET FEEDFORWARD & FEED-UP
          ========================================================================= -->
     <section id="tab-astma" class="tab-content hidden space-y-3">
+
 
       <div class="bg-blue-50 rounded-xl p-3 border border-blue-200 text-xs text-blue-950 shadow-sm">
         <span class="font-bold text-blue-900 block mb-0.5"><i class="fa-solid fa-compass"></i> OPDRACHT IN DE ASTMA:</span>
@@ -267,9 +353,11 @@
         </span>
       </div>
 
+
       <form id="astma-form" onsubmit="handleMutationSubmit(event)" class="bg-white rounded-2xl p-4 border border-slate-200 space-y-3 shadow-sm">
 
-        <!-- FEED-UP INVOER VAN DE LOPER -->
+
+        <!-- FEED-UP INVOER VAN DE RAPPORTEUR -->
         <div class="bg-amber-50 p-3 rounded-xl border border-amber-300 space-y-1">
           <label class="block text-[11px] font-bold text-amber-900">
             🎯 Mijn Feed-up (Welk specifiek punt zorg ik voor dat dit keer NIET fout gaat?):
@@ -277,6 +365,7 @@
           <input type="text" id="input-feedup" required placeholder="Bijv.: Ik let erop dat het signalement strikt van boven naar beneden loopt en zuiver in de T staat..." class="w-full bg-white border border-amber-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
           <span class="text-[10px] text-amber-800 block">Jouw peer-reviewer zal hier straks specifiek feedback op geven.</span>
         </div>
+
 
         <div>
           <label class="block text-[11px] font-bold text-slate-700 mb-0.5">A - Aanleiding (Melding OC via porto):</label>
@@ -299,11 +388,13 @@
           <input type="text" id="input-afh" required placeholder="Slachtoffer opgevangen, mutatie opgemaakt..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:bg-white focus:outline-none focus:border-blue-500">
         </div>
 
+
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow transition">
           <i class="fa-solid fa-paper-plane"></i> Mutatie Indienen & Rollen Wisselen
         </button>
       </form>
     </section>
+
 
     <!-- =========================================================================
          TAB 4: LIVEFEED & PEER-FEEDBACK
@@ -316,7 +407,9 @@
       <div id="feed-list" class="space-y-3"></div>
     </section>
 
+
   </main>
+
 
   <!-- PEER-FEEDBACK MODAL -->
   <div id="feedback-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -326,7 +419,9 @@
         <button onclick="closeFeedbackModal()" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
+
       <div id="feedback-preview-text" class="bg-slate-100 p-2.5 rounded-xl text-[11px] text-slate-800 font-mono border border-slate-200 max-h-28 overflow-y-auto"></div>
+
 
       <form onsubmit="handlePeerFeedbackSubmit(event)" class="space-y-2 text-xs">
         <div>
@@ -361,6 +456,7 @@
     </div>
   </div>
 
+
   <!-- VASTE NAVIGATIE ONDERAAN -->
   <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-slate-200 z-40 px-2 py-1 flex justify-around shadow-lg">
     <button onclick="navigateToTab('porto')" id="nav-porto" class="flex flex-col items-center py-1 px-3 rounded-xl text-blue-600 font-bold transition">
@@ -382,6 +478,7 @@
     </button>
   </nav>
 
+
   <!-- JAVASCRIPT MOTOR -->
   <script>
     /* =========================================================================
@@ -397,9 +494,11 @@
       appId: "1:8681998187:web:fd08067494a010dc572e2e"
     };
 
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const DB_ROOT = 'mutatieles5';
+
 
     /* =========================================================================
        2. LOCATIES & 15 CASUSSEN MET SIGNALEMENTEN
@@ -411,6 +510,7 @@
       { id: 'd', name: 'Hal voor klapdeuren docentenafdeling (5e etage)' },
       { id: 'e', name: 'Ronde studieruimte (4e etage)' }
     ];
+
 
     const CASUSSEN = [
       {
@@ -715,24 +815,26 @@
       }
     ];
 
+
     /* =========================================================================
-       3. WEERGAVE VOOR CASUSAFBEELDINGEN (CASUS1.PNG T/M CASUS15.PNG + FALLBACK)
+       3. WEERGAVE VOOR CASUSAFBEELDINGEN (CASUS1.PNG / CASUS1B.PNG + FALLBACK)
        ========================================================================= */
-    function renderCaseImageHTML(c, cssClass = "w-full max-w-[280px]") {
-      const pngPath = `casus${c.id}.png`;
+    function renderCaseImageHTML(c, cssClass = "w-full max-w-[280px]", isB = false) {
+      const pngPath = isB ? `casus${c.id}b.png` : `casus${c.id}.png`;
+      const badgeText = isB ? `${c.badge} (B)` : c.badge;
       return `
         <div class="relative ${cssClass} rounded-xl overflow-hidden border border-slate-700 bg-black shadow-inner flex justify-center items-center">
           <img src="${pngPath}" 
                alt="${c.titel}" 
                class="w-full h-auto object-cover block"
-               onerror="if(!this.dataset.triedImg){this.dataset.triedImg=1;this.src='img/${pngPath}';}else{this.onerror=null;this.parentElement.innerHTML=renderSVGGraphic(${c.id});}" />
+               onerror="if(!this.dataset.triedImg){this.dataset.triedImg=1;this.src='img/${pngPath}';}else{this.onerror=null;this.parentElement.innerHTML=renderSVGGraphic(${c.id}, ${isB});}" />
           <!-- CCTV Scanlines & Overlay -->
           <div class="absolute inset-0 scanlines pointer-events-none opacity-30"></div>
           <div class="absolute top-0 inset-x-0 bg-black/75 px-2 py-0.5 flex justify-between items-center text-[9px] font-mono text-white">
             <span class="flex items-center gap-1">
               <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> CAM REC
             </span>
-            <span class="text-amber-300 font-bold">${c.badge}</span>
+            <span class="text-amber-300 font-bold">${badgeText}</span>
           </div>
           <div class="absolute bottom-0 inset-x-0 bg-black/75 px-2 py-0.5 text-[8px] font-mono text-sky-400 truncate text-center">
             ${c.locatie.name}
@@ -741,39 +843,46 @@
       `;
     }
 
+
     // Automatische back-up generator mocht een afbeelding offline zijn
-    function renderSVGGraphic(id) {
+    function renderSVGGraphic(id, isB = false) {
       const c = CASUSSEN.find(item => item.id === id);
       const v = c.visual;
+      const clothesColor = isB ? '#475569' : v.clothes;
+      const badgeText = isB ? `${c.badge} (B)` : c.badge;
       return `
         <svg viewBox="0 0 280 280" class="w-full max-w-[260px] h-auto rounded-lg shadow-inner bg-slate-900 border border-slate-700">
           <rect width="280" height="280" fill="#0f172a"/>
           <line x1="20" y1="100" x2="260" y2="100" stroke="#334155" stroke-dasharray="3,3"/>
           <line x1="20" y1="140" x2="260" y2="140" stroke="#334155" stroke-dasharray="3,3"/>
-          <path d="M70 280 C70 210, 100 200, 140 200 C180 200, 210 210, 210 280 Z" fill="${v.clothes}"/>
+          <path d="M70 280 C70 210, 100 200, 140 200 C180 200, 210 210, 210 280 Z" fill="${clothesColor}"/>
           <ellipse cx="140" cy="130" rx="38" ry="48" fill="${v.skin}"/>
           <ellipse cx="140" cy="98" rx="41" ry="24" fill="${v.hair}"/>
-          <text x="140" y="260" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">${c.badge}</text>
+          <text x="140" y="260" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="monospace">${badgeText}</text>
         </svg>
       `;
     }
+
 
     /* =========================================================================
        4. OC ACTIES: CASUS KIEZEN, FOTO BEKIJKEN, BEVESTIGEN EN DOORSTUREN
        ========================================================================= */
     let isSignalementConfirmedByOC = false;
 
+
     function pickRandomCaseForOC() {
       const rand = Math.floor(Math.random() * CASUSSEN.length);
       activeCase = CASUSSEN[rand];
       isSignalementConfirmedByOC = false;
 
+
       // Render foto OC (casus[X].png)
       document.getElementById('oc-photo-container').innerHTML = renderCaseImageHTML(activeCase);
 
+
       // Render meldingtekst
       document.getElementById('oc-case-details').innerHTML = `
-        <div class="font-bold text-white text-xs">${activeCase.titel} (#${activeCase.id})</div>
+        <div class="font-bold text-white text-xs">${activeCase.titel} (${activeCase.id})</div>
         <div class="text-amber-300 font-semibold text-[11px]">${activeCase.locatie.name}</div>
         <p class="text-slate-300 italic text-[11px] mt-1">"${activeCase.greeting}"</p>
         <div class="bg-slate-900 p-2 rounded border border-slate-800 text-[10px] font-mono text-slate-300 mt-1">
@@ -781,10 +890,12 @@
         </div>
       `;
 
+
       // Spreektekst voor via de porto
       document.getElementById('oc-speech-prompt').classList.remove('hidden');
       document.getElementById('oc-speech-text').textContent = 
         `"Eenheid ${currentDuo} van Meldkamer: Ga met spoed naar ${activeCase.locatie.name} i.v.m. ${activeCase.titel}. Uitkijken naar signalement: ${activeCase.answers.signalement}"`;
+
 
       // Knoppen resetten
       const confBtn = document.getElementById('btn-confirm-signalement');
@@ -792,27 +903,34 @@
       confBtn.className = "w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow transition";
       document.getElementById('confirm-btn-label').textContent = "1. Bevestig Signalement van Foto";
 
+
       const dispBtn = document.getElementById('btn-dispatch-loper');
       dispBtn.disabled = true;
       dispBtn.className = "w-full bg-slate-800 text-slate-600 font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition";
 
+
       playRadioChirp();
     }
+
 
     function confirmSignalementByOC() {
       if (!activeCase) return;
       isSignalementConfirmedByOC = true;
 
+
       const confBtn = document.getElementById('btn-confirm-signalement');
       confBtn.className = "w-full bg-emerald-700 text-emerald-200 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 border border-emerald-500/50";
       document.getElementById('confirm-btn-label').textContent = "✅ Signalement Geverifieerd & Akkoord";
+
 
       const dispBtn = document.getElementById('btn-dispatch-loper');
       dispBtn.disabled = false;
       dispBtn.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-blue-900/50 transition animate-pulse";
 
+
       playRadioChirp();
     }
+
 
     function broadcastCaseToPartner() {
       if (!activeCase || !isSignalementConfirmedByOC) {
@@ -820,7 +938,8 @@
         return;
       }
 
-      db.ref(`${DB_ROOT}/duos/${currentDuo}/mission`).set({
+
+      db.ref(`${currentDuo}/mission`).set({
         caseId: activeCase.id,
         locationName: activeCase.locatie.name,
         locationId: activeCase.locatie.id,
@@ -828,15 +947,19 @@
         dispatchedAt: Date.now()
       });
 
+
       document.getElementById('lcd-main-title').textContent = 'OPDRACHT VERZONDEN';
       document.getElementById('lcd-sub-title').textContent = activeCase.locatie.name;
       document.getElementById('lcd-loc-tag').textContent = `LOC: ${activeCase.locatie.id.toUpperCase()}`;
       playRadioChirp();
     }
 
+
     /* =========================================================================
-       5. LOPER ACTIE: AANKOMST & PROMINENT CAMERABEELD TER PLAATSE
+       5. RAPPORTEUR ACTIE: AANKOMST & KEUZE TUSSEN 2 PERSONEN (A vs B)
        ========================================================================= */
+    let currentSuspectChoiceMap = { '1': 'a', '2': 'b' };
+
     function unitArrivedAtScene() {
       if (!activeCase) return;
 
@@ -845,22 +968,113 @@
 
       document.getElementById('lcd-status-label').textContent = '● 10-23 T.P.';
       document.getElementById('lcd-main-title').textContent = 'TER PLAATSE';
-
-      // Toon het camerabeeld (casus[X].png) groot voor de loper
-      document.getElementById('loper-cctv-container').innerHTML = renderCaseImageHTML(activeCase);
       document.getElementById('loper-cctv-loc-badge').textContent = `LOC: ${activeCase.locatie.name.split(',')[0].toUpperCase()}`;
 
-      setupChatbotForCase(activeCase);
-      document.getElementById('chat-notification-dot').classList.remove('hidden');
+      // Toon de twee personen (A en B) aan de rapporteur om te kiezen
+      renderSuspectChoiceView();
       navigateToTab('verhoor');
     }
+
+    function renderSuspectChoiceView() {
+      const isAFirst = Math.random() < 0.5;
+      currentSuspectChoiceMap = {
+        '1': isAFirst ? 'a' : 'b',
+        '2': isAFirst ? 'b' : 'a'
+      };
+
+      const c = activeCase;
+      const is1B = (currentSuspectChoiceMap['1'] === 'b');
+      const is2B = (currentSuspectChoiceMap['2'] === 'b');
+
+      document.getElementById('loper-cctv-container').innerHTML = `
+        <div class="w-full p-2.5 space-y-2 bg-slate-950">
+          <div class="bg-amber-950/40 border border-amber-600/50 rounded-xl p-2 text-center text-slate-200">
+            <span class="text-amber-400 font-bold text-xs block">
+              <i class="fa-solid fa-users-viewfinder mr-1"></i> TWEE PERSONEN AANGETROFFEN TER PLAATSE
+            </span>
+            <span class="text-[10px] text-slate-300">
+              Kies op basis van het porto-signalement van het OC met wie je in gesprek gaat:
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <!-- PERSOON 1 -->
+            <div class="bg-slate-900 border border-slate-700 rounded-xl p-2 flex flex-col justify-between items-center space-y-2">
+              <span class="text-white font-bold text-[10px] bg-slate-800 px-2 py-0.5 rounded">PERSOON 1</span>
+              ${renderCaseImageHTML(c, "w-full", is1B)}
+              <button onclick="handleSuspectChoice('1')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-2 rounded-lg text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 shadow transition">
+                <i class="fa-solid fa-comments"></i> Spreek Aan
+              </button>
+            </div>
+
+            <!-- PERSOON 2 -->
+            <div class="bg-slate-900 border border-slate-700 rounded-xl p-2 flex flex-col justify-between items-center space-y-2">
+              <span class="text-white font-bold text-[10px] bg-slate-800 px-2 py-0.5 rounded">PERSOON 2</span>
+              ${renderCaseImageHTML(c, "w-full", is2B)}
+              <button onclick="handleSuspectChoice('2')" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-2 rounded-lg text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 shadow transition">
+                <i class="fa-solid fa-comments"></i> Spreek Aan
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Verhoor blokkeren tot keuze is gemaakt
+      document.getElementById('bot-name-label').textContent = 'Kies eerst de verdachte';
+      document.getElementById('bot-role-label').textContent = 'Signalement verifiëren...';
+      document.getElementById('chat-stream').innerHTML = `
+        <div class="text-center py-12 text-slate-400 text-xs">
+          <i class="fa-solid fa-hand text-amber-500 text-base mb-1 block"></i>
+          Kies hierboven tussen <strong>Persoon 1</strong> en <strong>Persoon 2</strong> om het verhoor te openen.
+        </div>
+      `;
+    }
+
+    function handleSuspectChoice(slot) {
+      if (!activeCase) return;
+      const chosenVariant = currentSuspectChoiceMap[slot];
+
+      if (chosenVariant === 'a') {
+        // JUISTE KEUZE!
+        playRadioChirp();
+        document.getElementById('loper-cctv-container').innerHTML = `
+          <div class="w-full flex flex-col items-center p-2 space-y-2">
+            <div class="w-full bg-emerald-950/70 border border-emerald-500/60 rounded-xl p-2 text-center text-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow">
+              <i class="fa-solid fa-circle-check text-emerald-400"></i> Juiste persoon gekozen! Signalement klopt met OC-melding.
+            </div>
+            ${renderCaseImageHTML(activeCase)}
+          </div>
+        `;
+        setupChatbotForCase(activeCase);
+        document.getElementById('chat-notification-dot').classList.remove('hidden');
+      } else {
+        // ONJUISTE KEUZE!
+        playSquelchNoise();
+        alert("❌ VERKEERDE PERSOON!\n\nDit signalement komt NIET overeen met de melding van het OC.\nDeze fout is zojuist gemeld in de Livefeed voor de hele klas!\n\nKijk nogmaals goed naar het signalement en kies opnieuw.");
+
+        // Stuur waarschuwing naar Firebase zodat het direct zichtbaar wordt in de Livefeed
+        const errId = 'ERR_' + Date.now();
+        const alertEntry = {
+          id: errId,
+          duo: currentDuo,
+          caseTitle: activeCase.titel,
+          isAlert: true,
+          alertText: `⚠️ FOUTE PERSOONSKEUZE: Rapporteur van ${currentDuo} heeft de verkeerde persoon aangesproken op locatie '${activeCase.locatie.name}'. Het signalement kwam niet overeen met de melding van het OC!`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        db.ref(`${DB_ROOT}/mutations/${errId}`).set(alertEntry);
+      }
+    }
+
 
     function setupChatbotForCase(c) {
       discoveredW.clear();
       updateWChecklist();
 
+
       document.getElementById('bot-name-label').textContent = `${c.personage} (${c.rol})`;
       document.getElementById('bot-role-label').textContent = `${c.locatie.name}`;
+
 
       const chatBox = document.getElementById('chat-stream');
       chatBox.innerHTML = `
@@ -876,11 +1090,13 @@
       `;
     }
 
+
     function askBotQuestion(qType) {
       if (!activeCase) {
         alert("Geen actieve casus. Vraag het OC om een melding!");
         return;
       }
+
 
       const qMap = {
         wie: "Wie bent u en wie was erbij betrokken?",
@@ -892,18 +1108,22 @@
         vlucht: "Waar rende de verdachte heen?"
       };
 
+
       appendUserChat(qMap[qType]);
+
 
       setTimeout(() => {
         let answer = activeCase.answers[qType] || "Dat weet ik helaas niet precies.";
         appendBotChat(answer);
         playSquelchNoise();
 
+
         if (qType === 'vlucht') discoveredW.add('hoe');
         else discoveredW.add(qType);
         updateWChecklist();
       }, 400);
     }
+
 
     function appendUserChat(msg) {
       const b = document.getElementById('chat-stream');
@@ -913,6 +1133,7 @@
       b.appendChild(div);
       b.scrollTop = b.scrollHeight;
     }
+
 
     function appendBotChat(msg) {
       const b = document.getElementById('chat-stream');
@@ -929,6 +1150,7 @@
       b.scrollTop = b.scrollHeight;
     }
 
+
     function updateWChecklist() {
       const keys = ['wie', 'wat', 'waar', 'wanneer', 'waarmee', 'hoe', 'signalement'];
       let count = 0;
@@ -944,6 +1166,7 @@
       document.getElementById('w-counter').textContent = `${count} / 7`;
     }
 
+
     /* =========================================================================
        6. AUDIO & ECHTE PTT MICROFOON STREAMING
        ========================================================================= */
@@ -953,10 +1176,12 @@
     let audioChunks = [];
     let isRecording = false;
 
+
     async function initMicAndAudio() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') await audioCtx.resume();
+
 
         micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         
@@ -968,10 +1193,12 @@
       }
     }
 
+
     function playRadioChirp() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
+
 
         const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
@@ -988,6 +1215,7 @@
       } catch(e) {}
     }
 
+
     function playSquelchNoise() {
       try {
         if (!audioCtx) return;
@@ -997,6 +1225,7 @@
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
+
         const noise = audioCtx.createBufferSource();
         noise.buffer = buffer;
         const filter = audioCtx.createBiquadFilter();
@@ -1004,9 +1233,11 @@
         filter.frequency.value = 1400;
         filter.Q.value = 2;
 
+
         const gain = audioCtx.createGain();
         gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
 
         noise.connect(filter);
         filter.connect(gain);
@@ -1015,12 +1246,14 @@
       } catch(e) {}
     }
 
+
     const pttBtn = document.getElementById('btn-ptt');
     pttBtn.addEventListener('mousedown', startVoiceRecording);
     pttBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startVoiceRecording(); });
     pttBtn.addEventListener('mouseup', stopVoiceRecording);
     pttBtn.addEventListener('touchend', (e) => { e.preventDefault(); stopVoiceRecording(); });
     pttBtn.addEventListener('touchcancel', (e) => { e.preventDefault(); stopVoiceRecording(); });
+
 
     async function startVoiceRecording() {
       if (isRecording) return;
@@ -1029,13 +1262,16 @@
         if (!micStream) return;
       }
 
+
       isRecording = true;
       audioChunks = [];
       pttBtn.classList.add('ptt-active');
       document.getElementById('ptt-label').textContent = "● SPREEK NU...";
       document.getElementById('lcd-status-label').textContent = "● TX (ZENDEN)";
 
+
       playRadioChirp();
+
 
       try {
         const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
@@ -1050,6 +1286,7 @@
       }
     }
 
+
     function stopVoiceRecording() {
       if (!isRecording) return;
       isRecording = false;
@@ -1057,12 +1294,15 @@
       document.getElementById('ptt-label').textContent = "HOUD INGEDRUKT OM TE PRATEN (PTT)";
       document.getElementById('lcd-status-label').textContent = "● STAND-BY";
 
+
       playSquelchNoise();
+
 
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
       }
     }
+
 
     function uploadVoiceMessage() {
       if (audioChunks.length === 0) return;
@@ -1070,13 +1310,14 @@
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = () => {
-        db.ref(`${DB_ROOT}/duos/${currentDuo}/voiceMsg`).set({
+        db.ref(`${currentDuo}/voiceMsg`).set({
           audio: reader.result,
           senderRole: currentRole,
           timestamp: Date.now()
         });
       };
     }
+
 
     function playIncomingVoice(base64Audio) {
       playRadioChirp();
@@ -1094,8 +1335,10 @@
           } catch(e) {}
         }
 
+
         document.getElementById('lcd-status-label').textContent = "● RX (SPRAAK)";
         document.getElementById('lcd-main-title').textContent = "INVOICE ONTVANGEN";
+
 
         audio.play().catch(e => console.log("Autoplay geblokkeerd:", e));
         audio.onended = () => {
@@ -1106,24 +1349,34 @@
       }, 250);
     }
 
+
     /* =========================================================================
        7. DUO & ROLLEN WISSELEN
        ========================================================================= */
     let currentDuo = 'DUO-01';
-    let currentRole = 'loper';
+    let currentRole = 'rapporteur';
     let activeCase = null;
     let discoveredW = new Set();
     let currentFeedbacksTargetId = null;
     let lastVoiceTimestamp = Date.now();
+    let selectedLoginRole = 'rapporteur';
+
 
     const chanSel = document.getElementById('channel-select');
+    const loginDuoSel = document.getElementById('login-duo-select');
     for (let i = 1; i <= 15; i++) {
       const val = `DUO-${i < 10 ? '0' + i : i}`;
       const opt = document.createElement('option');
       opt.value = val;
       opt.textContent = val;
       chanSel.appendChild(opt);
+
+      const optLogin = document.createElement('option');
+      optLogin.value = val;
+      optLogin.textContent = val;
+      loginDuoSel.appendChild(optLogin);
     }
+
 
     chanSel.addEventListener('change', (e) => {
       currentDuo = e.target.value;
@@ -1131,17 +1384,49 @@
       listenForDuoData();
     });
 
+
+    function selectLoginRole(role) {
+      selectedLoginRole = role;
+      const btnRap = document.getElementById('login-btn-rapporteur');
+      const btnOc = document.getElementById('login-btn-oc');
+      if (role === 'rapporteur') {
+        btnRap.className = 'py-2.5 px-3 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 font-bold text-xs flex items-center justify-center gap-2 transition';
+        btnOc.className = 'py-2.5 px-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-xs flex items-center justify-center gap-2 transition';
+      } else {
+        btnOc.className = 'py-2.5 px-3 rounded-xl border-2 border-amber-600 bg-amber-50 text-amber-700 font-bold text-xs flex items-center justify-center gap-2 transition';
+        btnRap.className = 'py-2.5 px-3 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-xs flex items-center justify-center gap-2 transition';
+      }
+    }
+
+
+    function confirmLogin() {
+      currentDuo = document.getElementById('login-duo-select').value;
+      currentRole = selectedLoginRole;
+
+      chanSel.value = currentDuo;
+      document.getElementById('lcd-channel-label').textContent = `CH: ${currentDuo}`;
+
+      updateRoleViews();
+      listenForDuoData();
+
+      document.getElementById('login-modal').classList.add('hidden');
+      playRadioChirp();
+    }
+
+
     function toggleUserRole() {
-      currentRole = (currentRole === 'loper') ? 'oc' : 'loper';
+      currentRole = (currentRole === 'rapporteur') ? 'oc' : 'rapporteur';
       updateRoleViews();
       playRadioChirp();
     }
+
 
     function updateRoleViews() {
       const btn = document.getElementById('role-toggle-btn');
       const vOc = document.getElementById('view-oc');
       const vLoper = document.getElementById('view-loper');
       const lcdRole = document.getElementById('lcd-role-label');
+
 
       if (currentRole === 'oc') {
         btn.textContent = '🎧 OC';
@@ -1150,17 +1435,19 @@
         vLoper.classList.add('hidden');
         lcdRole.textContent = 'ROL: OC';
       } else {
-        btn.textContent = '🏃 Loper';
+        btn.textContent = '🏃 Rapporteur';
         btn.className = 'bg-slate-100 border border-slate-300 text-xs px-2 py-1 rounded-lg font-bold text-blue-700';
         vOc.classList.add('hidden');
         vLoper.classList.remove('hidden');
-        lcdRole.textContent = 'ROL: LOPER';
+        lcdRole.textContent = 'ROL: RAPPORTEUR';
       }
     }
+
 
     function navigateToTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
 
       const tabs = ['porto', 'verhoor', 'astma', 'feed'];
       tabs.forEach(t => {
@@ -1172,16 +1459,19 @@
         }
       });
 
+
       if (tabName === 'verhoor') {
         document.getElementById('chat-notification-dot').classList.add('hidden');
       }
     }
 
+
     /* =========================================================================
-       8. ASTMA FORMULIER VERSTUREN (MET FEED-UP DOEL VAN DE LOPER)
+       8. ASTMA FORMULIER VERSTUREN (MET FEED-UP DOEL VAN DE RAPPORTEUR)
        ========================================================================= */
     function handleMutationSubmit(e) {
       e.preventDefault();
+
 
       const feedup = document.getElementById('input-feedup').value.trim();
       const a = document.getElementById('input-a').value.trim();
@@ -1190,34 +1480,39 @@
       const m = document.getElementById('input-m').value.trim();
       const afh = document.getElementById('input-afh').value.trim();
 
+
       const newMut = {
         id: 'MUT_' + Date.now(),
         duo: currentDuo,
         caseTitle: activeCase ? activeCase.titel : 'Eigen casus',
         location: activeCase ? activeCase.locatie.name : 'Gebouw',
         authorRole: currentRole,
-        feedup: feedup, // <--- Slaat het feed-up doel van de student op!
+        feedup: feedup,
         astma: { a, s, t, m, afh },
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         feedbacks: []
       };
 
+
       // Correct Firebase pad naar mutatieles5/mutations
       db.ref(`${DB_ROOT}/mutations/${newMut.id}`).set(newMut);
+
 
       document.getElementById('astma-form').reset();
       alert("✅ Mutatie opgeslagen! De rollen binnen " + currentDuo + " wisselen nu automatisch om.");
 
+
       toggleUserRole();
       navigateToTab('feed');
     }
+
 
     /* =========================================================================
        9. REALTIME LISTENERS: LOCATIE EN OPDRACHT ONTVANGEN (SIGNALEMENT VIA PORTO)
        ========================================================================= */
     function listenForDuoData() {
       // Voice listener
-      db.ref(`${DB_ROOT}/duos/${currentDuo}/voiceMsg`).on('value', snap => {
+      db.ref(`${currentDuo}/voiceMsg`).on('value', snap => {
         const data = snap.val();
         if (!data) return;
         if (data.timestamp > lastVoiceTimestamp && data.senderRole !== currentRole) {
@@ -1226,22 +1521,25 @@
         }
       });
 
-      // Opdracht listener (alleen locatie en casus - GEEN uitgeschreven signalement!)
-      db.ref(`${DB_ROOT}/duos/${currentDuo}/mission`).on('value', snap => {
+
+      // Opdracht listener
+      db.ref(`${currentDuo}/mission`).on('value', snap => {
         const data = snap.val();
         if (!data) return;
+
 
         const c = CASUSSEN.find(item => item.id === data.caseId);
         if (c) {
           activeCase = c;
 
-          if (currentRole === 'loper') {
+
+          if (currentRole === 'rapporteur') {
             playRadioChirp();
             document.getElementById('lcd-main-title').textContent = 'OPDRACHT ONTVANGEN!';
             document.getElementById('lcd-sub-title').textContent = c.locatie.name;
             document.getElementById('lcd-loc-tag').textContent = `LOC: ${c.locatie.id.toUpperCase()}`;
 
-            // Toon de opdracht (zonder tekstueel signalement!)
+
             document.getElementById('loper-instruction').innerHTML = `
               Ga nu met spoed naar: <strong class="text-amber-300 block text-xs mt-0.5">${c.locatie.name}</strong>
               <span class="text-[10px] text-slate-400 mt-0.5 block">Luister goed naar de porto voor het signalement en druk op 'Ik ben er' als je ter plaatse bent!</span>
@@ -1252,8 +1550,9 @@
       });
     }
 
+
     /* =========================================================================
-       10. LIVEFEED & PEER-FEEDBACK (MET FEED-UP BEOORDELING)
+       10. LIVEFEED & PEER-FEEDBACK (MET FOUTSIGNALERING WEERGAVE)
        ========================================================================= */
     let cachedFeed = [];
     db.ref(`${DB_ROOT}/mutations`).on('value', snap => {
@@ -1270,17 +1569,41 @@
       renderFeedList(list);
     });
 
+
     function renderFeedList(list) {
       cachedFeed = list;
       const box = document.getElementById('feed-list');
       document.getElementById('feed-count').textContent = `${list.length} ingediend`;
+
 
       if (list.length === 0) {
         box.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs">Nog geen mutaties ingediend.</div>`;
         return;
       }
 
+
       box.innerHTML = list.slice().reverse().map(m => {
+
+        // ALERTMELDING BIJ VERKEERDE SIGNALEMENT-KEUZE DOOR DE RAPPORTEUR
+        if (m.isAlert) {
+          return `
+            <div class="bg-red-50 border-2 border-red-500 rounded-xl p-3 shadow-md space-y-1.5 text-red-950">
+              <div class="flex justify-between items-center border-b border-red-200 pb-1">
+                <span class="text-[11px] font-black bg-red-600 text-white px-2 py-0.5 rounded shadow-sm">${m.duo}</span>
+                <span class="text-xs font-black text-red-700 tracking-wide flex items-center gap-1">
+                  <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> FOUTE SIGNALEMENT KEUZE
+                </span>
+                <span class="text-[10px] text-red-500 font-mono font-bold">${m.timestamp}</span>
+              </div>
+              <div class="text-xs font-semibold leading-snug">
+                ${m.alertText}
+              </div>
+            </div>
+          `;
+        }
+
+
+        // REGULIERE ASTMA MUTATIE
         const fbHtml = (m.feedbacks && m.feedbacks.length > 0)
           ? m.feedbacks.map(f => `
             <div class="bg-slate-50 p-2 rounded-lg border-l-2 border-emerald-500 text-[11px] space-y-0.5 border border-slate-200">
@@ -1296,6 +1619,7 @@
           `).join('')
           : `<p class="text-slate-400 text-[10px] italic">Nog geen peer-feedback ontvangen.</p>`;
 
+
         return `
           <div class="bg-white rounded-xl p-3 border border-slate-200 space-y-2 shadow-sm text-slate-800">
             <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
@@ -1303,6 +1627,7 @@
               <span class="text-xs font-bold text-slate-900">${m.caseTitle}</span>
               <span class="text-[10px] text-slate-400 font-mono">${m.timestamp}</span>
             </div>
+
 
             <!-- FEED-UP PUNT WEERGAVE -->
             ${m.feedup ? `
@@ -1315,13 +1640,15 @@
               </div>
             ` : ''}
 
+
             <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 text-[11px] font-mono text-slate-700 space-y-1">
-              <div><strong class="text-blue-700">A:</strong> ${m.astma.a}</div>
-              <div><strong class="text-blue-700">S:</strong> ${m.astma.s}</div>
-              <div class="bg-amber-50/70 pl-1 border-l border-amber-400"><strong class="text-amber-800">T:</strong> ${m.astma.t}</div>
-              <div><strong class="text-blue-700">M:</strong> ${m.astma.m}</div>
-              <div><strong class="text-blue-700">A:</strong> ${m.astma.afh}</div>
+              <div><strong class="text-blue-700">A:</strong> ${m.astma ? m.astma.a : ''}</div>
+              <div><strong class="text-blue-700">S:</strong> ${m.astma ? m.astma.s : ''}</div>
+              <div class="bg-amber-50/70 pl-1 border-l border-amber-400"><strong class="text-amber-800">T:</strong> ${m.astma ? m.astma.t : ''}</div>
+              <div><strong class="text-blue-700">M:</strong> ${m.astma ? m.astma.m : ''}</div>
+              <div><strong class="text-blue-700">A:</strong> ${m.astma ? m.astma.afh : ''}</div>
             </div>
+
 
             <div class="flex justify-between items-center pt-1 border-t border-slate-100">
               <span class="text-[10px] font-bold text-slate-500">Peer Reviews (${m.feedbacks ? m.feedbacks.length : 0})</span>
@@ -1330,33 +1657,39 @@
               </button>
             </div>
 
+
             <div class="space-y-1 pt-1">${fbHtml}</div>
           </div>
         `;
       }).join('');
     }
 
+
     function openFeedbackModal(mutId) {
       currentFeedbacksTargetId = mutId;
       const target = cachedFeed.find(m => m.id === mutId);
       if (!target) return;
 
+
       document.getElementById('feedback-preview-text').innerHTML = `
         <strong>${target.duo} - ${target.caseTitle}</strong><br>
         ${target.feedup ? `<div class="bg-amber-50 p-1.5 rounded my-1 text-amber-900 font-sans border border-amber-200"><strong>🎯 Gekozen Feed-up doel:</strong> "${target.feedup}"</div>` : ''}
-        <span class="text-slate-700"><strong>T:</strong> ${target.astma.t}</span>
+        <span class="text-slate-700"><strong>T:</strong> ${target.astma ? target.astma.t : ''}</span>
       `;
       document.getElementById('feedback-modal').classList.remove('hidden');
     }
+
 
     function closeFeedbackModal() {
       document.getElementById('feedback-modal').classList.add('hidden');
       currentFeedbacksTargetId = null;
     }
 
+
     function handlePeerFeedbackSubmit(e) {
       e.preventDefault();
       if (!currentFeedbacksTargetId) return;
+
 
       const fb = {
         reviewer: currentDuo,
@@ -1367,6 +1700,7 @@
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
+
       db.ref(`${DB_ROOT}/mutations/${currentFeedbacksTargetId}/feedbacks`).push(fb);
       closeFeedbackModal();
       document.getElementById('fb-top-text').value = '';
@@ -1374,12 +1708,14 @@
       playRadioChirp();
     }
 
+
     /* =========================================================================
        11. DATABASE RESETTEN (Master Reset Knop)
        ========================================================================= */
     function resetWholeDatabase() {
       const ok = confirm("⚠️ GEHELE DATABASE RESETTEN?\n\nHiermee wis je alle actieve oproepen, spraakberichten en mutaties voor de hele klas.");
       if (!ok) return;
+
 
       db.ref(DB_ROOT).remove()
         .then(() => {
@@ -1389,11 +1725,11 @@
         .catch(err => alert("Fout bij resetten: " + err.message));
     }
 
+
     // Start-up
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('lcd-channel-label').textContent = `CH: ${currentDuo}`;
-      updateRoleViews();
-      listenForDuoData();
+      // Inlogmodal toont zichzelf standaard bij het laden
     });
   </script>
 </body>
