@@ -32,6 +32,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen pb-24 font-sans select-none antialiased">
 
+
   <!-- =========================================================================
        INLOG- EN INSTRUCTIESCHERM (STARTMODAL)
        ========================================================================= -->
@@ -45,6 +46,7 @@
         <h2 class="text-base font-black text-slate-900 tracking-wide uppercase">C2000 Porto & Signalement Training</h2>
         <p class="text-xs text-slate-500 font-medium">Kies je Duo en je rol om de training te starten</p>
       </div>
+
 
       <!-- UITLEG OPDRACHT -->
       <div class="bg-blue-50 border border-blue-200 rounded-2xl p-3 text-xs text-blue-950 space-y-2 leading-relaxed">
@@ -60,6 +62,7 @@
         </ul>
       </div>
 
+
       <!-- KEUZEFORMULIER -->
       <div class="space-y-3">
         <div>
@@ -68,6 +71,7 @@
             <!-- Vult DUO-01 t/m DUO-15 -->
           </select>
         </div>
+
 
         <div>
           <label class="block text-[11px] font-bold text-slate-700 mb-1">2. Kies jouw rol binnen het duo:</label>
@@ -82,12 +86,16 @@
         </div>
       </div>
 
+
       <button onclick="confirmLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition">
         <i class="fa-solid fa-play"></i> Inloggen & Starten
       </button>
 
+
     </div>
   </div>
+
+
 
 
   <!-- ACTIVATIE BANNER VOOR MICROFOON & AUDIO -->
@@ -95,6 +103,8 @@
     <i class="fa-solid fa-microphone-lines animate-pulse text-sm"></i>
     <span id="mic-status-label">TIK HIER OM MICROFOON & PORTO-AUDIO TE STARTEN</span>
   </div>
+
+
 
 
   <!-- MOBIELE TOPBAR -->
@@ -105,6 +115,8 @@
         C2000 LIVE PORTO
       </h1>
     </div>
+
+
 
 
     <div class="flex items-center gap-1.5">
@@ -121,7 +133,11 @@
   </header>
 
 
+
+
   <main class="max-w-md mx-auto px-3 pt-3">
+
+
 
 
     <!-- =========================================================================
@@ -130,9 +146,13 @@
     <section id="tab-porto" class="tab-content space-y-3">
 
 
+
+
       <!-- C2000 HANDHELD RADIO (Blijft authentiek donker als echt toestel) -->
       <div class="bg-slate-900 text-slate-100 rounded-3xl p-4 border-2 border-slate-700 shadow-xl relative">
         <div class="w-3.5 h-7 bg-slate-700 absolute -top-7 left-8 rounded-t border-t border-slate-500"></div>
+
+
 
 
         <!-- Speaker grill -->
@@ -141,6 +161,8 @@
           <div class="w-12 h-1 bg-slate-800 rounded-full"></div>
           <div class="w-8 h-1 bg-slate-800 rounded-full"></div>
         </div>
+
+
 
 
         <!-- LCD Scherm -->
@@ -164,20 +186,24 @@
         </div>
 
 
+
+
         <!-- BEDIENING & PTT -->
         <div class="space-y-2.5">
           
           <!-- HOUD INGEDRUKT OM ECHT TE PRATEN (PTT) -->
           <div class="relative">
             <button id="btn-ptt"
-                    class="btn-ptt-trigger w-full bg-amber-600 hover:bg-amber-500 active:bg-red-600 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition select-none cursor-pointer">
+                    class="w-full bg-amber-600 hover:bg-amber-500 active:bg-red-600 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition select-none cursor-pointer">
               <i class="fa-solid fa-microphone text-base"></i>
-              <span class="ptt-label-text" id="ptt-label">HOUD INGEDRUKT OM TE PRATEN (PTT)</span>
+              <span id="ptt-label">HOUD INGEDRUKT OM TE PRATEN (PTT)</span>
             </button>
             <div class="text-[9px] text-center text-slate-400 mt-1">
               Spreek fysiek in je telefoon en laat los om te verzenden
             </div>
           </div>
+
+
 
 
           <!-- SCHERM VOOR OC (STUDENT 2) -->
@@ -193,13 +219,19 @@
               </div>
 
 
+
+
               <!-- AFBEELDING OC -->
               <div id="oc-photo-container" class="w-full rounded-xl overflow-hidden border border-slate-700 shadow-inner bg-slate-900 flex justify-center">
                 <div class="py-8 text-slate-500 text-xs italic">Druk op 'Nieuw Incident' om de melding en foto op te halen.</div>
               </div>
 
 
+
+
               <div id="oc-case-details" class="text-xs space-y-1"></div>
+
+
 
 
               <!-- PORTO VOORLEES-INSTRUCTIE VOOR HET OC -->
@@ -211,6 +243,8 @@
               </div>
 
 
+
+
               <!-- BEVESTIGINGSKNOP VOOR HET OC -->
               <button id="btn-confirm-signalement" onclick="confirmSignalementByOC()" disabled class="w-full bg-slate-800 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                 <i class="fa-solid fa-check-double text-emerald-400"></i>
@@ -219,10 +253,14 @@
             </div>
 
 
+
+
             <button id="btn-dispatch-loper" onclick="broadcastCaseToPartner()" disabled class="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
               <i class="fa-solid fa-paper-plane"></i> 2. Stuur Opdracht Naar Rapporteur
             </button>
           </div>
+
+
 
 
           <!-- SCHERM VOOR RAPPORTEUR (STUDENT 1) -->
@@ -236,12 +274,8 @@
               </div>
             </div>
 
-            <!-- SPREEKKNOP BIJ HET ONTVANGEN VAN DE MELDING -->
-            <button id="btn-ptt-loper"
-                    class="btn-ptt-trigger w-full bg-amber-600 hover:bg-amber-500 active:bg-red-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition select-none cursor-pointer">
-              <i class="fa-solid fa-microphone text-base"></i>
-              <span class="ptt-label-text" id="ptt-label-loper">HOUD INGEDRUKT OM TE BEANTWOORDEN (PTT)</span>
-            </button>
+
+
 
             <button id="btn-arrived" onclick="unitArrivedAtScene()" disabled class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transition">
               <i class="fa-solid fa-flag-checkered text-base"></i> 📍 Ik ben ter plaatse / Ik ben er
@@ -249,8 +283,12 @@
           </div>
 
 
+
+
         </div>
       </div>
+
+
 
 
       <!-- Locaties in het gebouw -->
@@ -266,7 +304,11 @@
       </div>
 
 
+
+
     </section>
+
+
 
 
     <!-- =========================================================================
@@ -274,7 +316,7 @@
          ========================================================================= -->
     <section id="tab-verhoor" class="tab-content hidden space-y-3">
       
-      <!-- C2000 PORTO OVERLEGKNOP (BOVENAAN VERHOORSCHERM) -->
+      <!-- C2000 PORTO OVERLEGKNOP (BLIJFT ALTIJD ZICHTBAAR VOOR OVERLEG MET OC) -->
       <div class="bg-slate-900 text-slate-100 rounded-2xl p-3 border-2 border-slate-700 shadow-lg space-y-1">
         <div class="flex justify-between items-center text-[10px] text-slate-400 font-mono pb-1 border-b border-slate-800">
           <span><i class="fa-solid fa-walkie-talkie text-amber-400 mr-1"></i> C2000 PORTO (OVERLEG MET OC)</span>
@@ -282,15 +324,17 @@
         </div>
         <div class="relative pt-1">
           <button id="btn-ptt-verhoor"
-                  class="btn-ptt-trigger w-full bg-amber-600 hover:bg-amber-500 active:bg-red-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow transition select-none cursor-pointer">
+                  class="w-full bg-amber-600 hover:bg-amber-500 active:bg-red-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow transition select-none cursor-pointer">
             <i class="fa-solid fa-microphone text-base"></i>
-            <span class="ptt-label-text" id="ptt-label-verhoor">HOUD INGEDRUKT OM TE PRATEN (PTT)</span>
+            <span id="ptt-label-verhoor">HOUD INGEDRUKT OM TE PRATEN (PTT)</span>
           </button>
         </div>
         <div class="text-[9px] text-center text-slate-400">
           Houd ingedrukt om live te overleggen met het OC over het signalement
         </div>
       </div>
+
+
 
 
       <!-- HET PROMINENTE CAMERABEELD VOOR DE RAPPORTEUR -->
@@ -303,15 +347,21 @@
         </div>
 
 
+
+
         <div id="loper-cctv-container" class="w-full flex justify-center bg-black rounded-xl overflow-hidden border border-slate-800 min-h-[180px] shadow-inner relative">
           <div class="py-12 text-slate-400 text-xs italic">Geen camerabeeld geladen. Meld je eerst ter plaatse via de porto.</div>
         </div>
+
+
 
 
         <p class="text-[10px] text-slate-500 text-center">
           Bestudeer het camerabeeld: vergelijk het met het verhoor hieronder en verwerk dit in de ASTMA-mutatie.
         </p>
       </div>
+
+
 
 
       <!-- Verhoor Status & Gouden W Teller -->
@@ -332,6 +382,8 @@
       </div>
 
 
+
+
       <!-- Checklist Chips -->
       <div class="flex flex-wrap gap-1 bg-slate-200/70 p-1.5 rounded-lg border border-slate-300 text-[9px] font-bold">
         <span id="chip-wie" class="px-1.5 py-0.5 rounded bg-white text-slate-500 border border-slate-300">WIE</span>
@@ -344,12 +396,16 @@
       </div>
 
 
+
+
       <!-- Chat Stream -->
       <div id="chat-stream" class="bg-white rounded-2xl p-3 border border-slate-200 h-[220px] overflow-y-auto space-y-2 text-xs shadow-inner">
         <div class="text-center py-12 text-slate-400 text-xs">
           Druk op de Porto-tab op <strong>"Ik ben ter plaatse"</strong> om het camerabeeld en het verhoor te openen.
         </div>
       </div>
+
+
 
 
       <!-- Vraagknoppen -->
@@ -365,10 +421,14 @@
     </section>
 
 
+
+
     <!-- =========================================================================
          TAB 3: ASTMA MUTATIE MET FEEDFORWARD & FEED-UP
          ========================================================================= -->
     <section id="tab-astma" class="tab-content hidden space-y-3">
+
+
 
 
       <div class="bg-blue-50 rounded-xl p-3 border border-blue-200 text-xs text-blue-950 shadow-sm">
@@ -379,7 +439,11 @@
       </div>
 
 
+
+
       <form id="astma-form" onsubmit="handleMutationSubmit(event)" class="bg-white rounded-2xl p-4 border border-slate-200 space-y-3 shadow-sm">
+
+
 
 
         <!-- FEED-UP INVOER VAN DE RAPPORTEUR -->
@@ -390,6 +454,8 @@
           <input type="text" id="input-feedup" required placeholder="Bijv.: Ik let erop dat het signalement strikt van boven naar beneden loopt en zuiver in de T staat..." class="w-full bg-white border border-amber-300 rounded-xl p-2 text-xs text-slate-900 text-base sm:text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
           <span class="text-[10px] text-amber-800 block">Jouw peer-reviewer zal hier straks specifiek feedback op geven.</span>
         </div>
+
+
 
 
         <div>
@@ -414,11 +480,15 @@
         </div>
 
 
+
+
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow transition">
           <i class="fa-solid fa-paper-plane"></i> Mutatie Indienen & Rollen Wisselen
         </button>
       </form>
     </section>
+
+
 
 
     <!-- =========================================================================
@@ -433,7 +503,11 @@
     </section>
 
 
+
+
   </main>
+
+
 
 
   <!-- PEER-FEEDBACK MODAL -->
@@ -445,7 +519,11 @@
       </div>
 
 
+
+
       <div id="feedback-preview-text" class="bg-slate-100 p-2.5 rounded-xl text-[11px] text-slate-800 font-mono border border-slate-200 max-h-28 overflow-y-auto"></div>
+
+
 
 
       <form onsubmit="handlePeerFeedbackSubmit(event)" class="space-y-2 text-xs">
@@ -482,6 +560,8 @@
   </div>
 
 
+
+
   <!-- VASTE NAVIGATIE ONDERAAN -->
   <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-slate-200 z-40 px-2 py-1 flex justify-around shadow-lg">
     <button onclick="navigateToTab('porto')" id="nav-porto" class="flex flex-col items-center py-1 px-3 rounded-xl text-blue-600 font-bold transition">
@@ -504,6 +584,8 @@
   </nav>
 
 
+
+
   <!-- JAVASCRIPT MOTOR -->
   <script>
     /* =========================================================================
@@ -520,9 +602,13 @@
     };
 
 
+
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const DB_ROOT = 'mutatieles5';
+
+
 
 
     /* =========================================================================
@@ -535,6 +621,8 @@
       { id: 'd', name: 'Hal voor klapdeuren docentenafdeling (5e etage)' },
       { id: 'e', name: 'Ronde studieruimte (4e etage)' }
     ];
+
+
 
 
     const CASUSSEN = [
@@ -841,11 +929,13 @@
     ];
 
 
+
+
     /* =========================================================================
        3. WEERGAVE VOOR CASUSAFBEELDINGEN (CASUS1.PNG / CASUS1B.PNG + FALLBACK)
        ========================================================================= */
     function renderCaseImageHTML(c, cssClass = "w-full max-w-[280px]", isB = false) {
-      const pngPath = isB ? `casus${c.id}b.png` : `casus${c.id}.png`;
+      const pngPath = isB ? `casus${c.id}B.png` : `casus${c.id}.png`;
       const badgeText = isB ? `${c.badge} (B)` : c.badge;
       return `
         <div class="relative ${cssClass} rounded-xl overflow-hidden border border-slate-700 bg-black shadow-inner flex justify-center items-center">
@@ -869,6 +959,8 @@
     }
 
 
+
+
     // Automatische back-up generator mocht een afbeelding offline zijn
     function renderSVGGraphic(id, isB = false) {
       const c = CASUSSEN.find(item => item.id === id);
@@ -889,10 +981,14 @@
     }
 
 
+
+
     /* =========================================================================
        4. OC ACTIES: CASUS KIEZEN, FOTO BEKIJKEN, BEVESTIGEN EN DOORSTUREN
        ========================================================================= */
     let isSignalementConfirmedByOC = false;
+
+
 
 
     function pickRandomCaseForOC() {
@@ -901,13 +997,17 @@
       isSignalementConfirmedByOC = false;
 
 
+
+
       // Render foto OC (casus[X].png)
       document.getElementById('oc-photo-container').innerHTML = renderCaseImageHTML(activeCase);
 
 
+
+
       // Render meldingtekst
       document.getElementById('oc-case-details').innerHTML = `
-        <div class="font-bold text-white text-xs">${activeCase.titel} (${activeCase.id})</div>
+        <div class="font-bold text-white text-xs">${activeCase.id})</div>
         <div class="text-amber-300 font-semibold text-[11px]">${activeCase.locatie.name}</div>
         <p class="text-slate-300 italic text-[11px] mt-1">"${activeCase.greeting}"</p>
         <div class="bg-slate-900 p-2 rounded border border-slate-800 text-[10px] font-mono text-slate-300 mt-1">
@@ -916,10 +1016,14 @@
       `;
 
 
+
+
       // Spreektekst voor via de porto
       document.getElementById('oc-speech-prompt').classList.remove('hidden');
       document.getElementById('oc-speech-text').textContent = 
         `"Eenheid ${currentDuo} van Meldkamer: Ga met spoed naar ${activeCase.locatie.name} i.v.m. ${activeCase.titel}. Uitkijken naar signalement: ${activeCase.answers.signalement}"`;
+
+
 
 
       // Knoppen resetten
@@ -929,13 +1033,19 @@
       document.getElementById('confirm-btn-label').textContent = "1. Bevestig Signalement van Foto";
 
 
+
+
       const dispBtn = document.getElementById('btn-dispatch-loper');
       dispBtn.disabled = true;
       dispBtn.className = "w-full bg-slate-800 text-slate-600 font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition";
 
 
+
+
       playRadioChirp();
     }
+
+
 
 
     function confirmSignalementByOC() {
@@ -943,9 +1053,13 @@
       isSignalementConfirmedByOC = true;
 
 
+
+
       const confBtn = document.getElementById('btn-confirm-signalement');
       confBtn.className = "w-full bg-emerald-700 text-emerald-200 font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 border border-emerald-500/50";
       document.getElementById('confirm-btn-label').textContent = "✅ Signalement Geverifieerd & Akkoord";
+
+
 
 
       const dispBtn = document.getElementById('btn-dispatch-loper');
@@ -953,8 +1067,12 @@
       dispBtn.className = "w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-blue-900/50 transition animate-pulse";
 
 
+
+
       playRadioChirp();
     }
+
+
 
 
     function broadcastCaseToPartner() {
@@ -962,6 +1080,8 @@
         alert("Bevestig eerst het signalement via stap 1!");
         return;
       }
+
+
 
 
       db.ref(`${currentDuo}/mission`).set({
@@ -973,6 +1093,8 @@
       });
 
 
+
+
       document.getElementById('lcd-main-title').textContent = 'OPDRACHT VERZONDEN';
       document.getElementById('lcd-sub-title').textContent = activeCase.locatie.name;
       document.getElementById('lcd-loc-tag').textContent = `LOC: ${activeCase.locatie.id.toUpperCase()}`;
@@ -980,25 +1102,32 @@
     }
 
 
+
+
     /* =========================================================================
        5. RAPPORTEUR ACTIE: AANKOMST & KEUZE TUSSEN 2 PERSONEN (A vs B)
        ========================================================================= */
     let currentSuspectChoiceMap = { '1': 'a', '2': 'b' };
 
+
     function unitArrivedAtScene() {
       if (!activeCase) return;
 
+
       playRadioChirp();
       setTimeout(playSquelchNoise, 150);
+
 
       document.getElementById('lcd-status-label').textContent = '● 10-23 T.P.';
       document.getElementById('lcd-main-title').textContent = 'TER PLAATSE';
       document.getElementById('loper-cctv-loc-badge').textContent = `LOC: ${activeCase.locatie.name.split(',')[0].toUpperCase()}`;
 
+
       // Toon de twee personen (A en B) aan de rapporteur om te kiezen
       renderSuspectChoiceView();
       navigateToTab('verhoor');
     }
+
 
     function renderSuspectChoiceView() {
       const isAFirst = Math.random() < 0.5;
@@ -1007,9 +1136,11 @@
         '2': isAFirst ? 'b' : 'a'
       };
 
+
       const c = activeCase;
       const is1B = (currentSuspectChoiceMap['1'] === 'b');
       const is2B = (currentSuspectChoiceMap['2'] === 'b');
+
 
       document.getElementById('loper-cctv-container').innerHTML = `
         <div class="w-full p-2.5 space-y-2 bg-slate-950">
@@ -1018,16 +1149,10 @@
               <i class="fa-solid fa-users-viewfinder mr-1"></i> TWEE PERSONEN AANGETROFFEN TER PLAATSE
             </span>
             <span class="text-[10px] text-slate-300">
-              Overleg via de porto met OC over het signalement en kies met wie je in gesprek gaat:
+              Gebruik de porto-knop hierboven om te overleggen met OC, en kies met wie je in gesprek gaat:
             </span>
           </div>
 
-          <!-- DIRECTE PORTO SPREEKKNOP BIJ DE KEUZE -->
-          <button id="btn-ptt-choice"
-                  class="btn-ptt-trigger w-full bg-amber-600 hover:bg-amber-500 active:bg-red-600 text-white font-black py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition select-none cursor-pointer">
-            <i class="fa-solid fa-microphone text-base"></i>
-            <span class="ptt-label-text" id="ptt-label-choice">HOUD INGEDRUKT VOOR OVERLEG MET OC (PTT)</span>
-          </button>
 
           <div class="grid grid-cols-2 gap-2">
             <!-- PERSOON 1 -->
@@ -1038,6 +1163,7 @@
                 <i class="fa-solid fa-comments"></i> Spreek Aan
               </button>
             </div>
+
 
             <!-- PERSOON 2 -->
             <div class="bg-slate-900 border border-slate-700 rounded-xl p-2 flex flex-col justify-between items-center space-y-2">
@@ -1051,8 +1177,6 @@
         </div>
       `;
 
-      // Koppel de PTT spreekknop binnen het keuzescherm direct aan dezelfde audio-motor
-      bindPtt(document.getElementById('btn-ptt-choice'));
 
       // Verhoor blokkeren tot keuze is gemaakt
       document.getElementById('bot-name-label').textContent = 'Kies eerst de verdachte';
@@ -1065,9 +1189,11 @@
       `;
     }
 
+
     function handleSuspectChoice(slot) {
       if (!activeCase) return;
       const chosenVariant = currentSuspectChoiceMap[slot];
+
 
       if (chosenVariant === 'a') {
         // JUISTE KEUZE!
@@ -1087,6 +1213,7 @@
         playSquelchNoise();
         alert("❌ VERKEERDE PERSOON!\n\nDit signalement komt NIET overeen met de melding van het OC.\nDeze fout is zojuist gemeld in de Livefeed voor de hele klas!\n\nGebruik de porto-knop om te overleggen met het OC en kies opnieuw.");
 
+
         // Stuur waarschuwing naar Firebase zodat het direct zichtbaar wordt in de Livefeed
         const errId = 'ERR_' + Date.now();
         const alertEntry = {
@@ -1094,7 +1221,7 @@
           duo: currentDuo,
           caseTitle: activeCase.titel,
           isAlert: true,
-          alertText: `⚠️ FOUTE PERSOONSKEUZE: Rapporteur van ${currentDuo} heeft de verkeerde persoon aangesproken op locatie '${activeCase.locatie.name}'. Het signalement kwam niet overeen met de melding van het OC!`,
+          alertText: `⚠️ FOUTE PERSOONSKEUZE: Rapporteur van ${activeCase.locatie.name}'. Het signalement kwam niet overeen met de melding van het OC!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         db.ref(`${DB_ROOT}/mutations/${errId}`).set(alertEntry);
@@ -1102,13 +1229,19 @@
     }
 
 
+
+
     function setupChatbotForCase(c) {
       discoveredW.clear();
       updateWChecklist();
 
 
+
+
       document.getElementById('bot-name-label').textContent = `${c.personage} (${c.rol})`;
       document.getElementById('bot-role-label').textContent = `${c.locatie.name}`;
+
+
 
 
       const chatBox = document.getElementById('chat-stream');
@@ -1126,11 +1259,15 @@
     }
 
 
+
+
     function askBotQuestion(qType) {
       if (!activeCase) {
         alert("Geen actieve casus. Vraag het OC om een melding!");
         return;
       }
+
+
 
 
       const qMap = {
@@ -1144,7 +1281,11 @@
       };
 
 
+
+
       appendUserChat(qMap[qType]);
+
+
 
 
       setTimeout(() => {
@@ -1153,11 +1294,15 @@
         playSquelchNoise();
 
 
+
+
         if (qType === 'vlucht') discoveredW.add('hoe');
         else discoveredW.add(qType);
         updateWChecklist();
       }, 400);
     }
+
+
 
 
     function appendUserChat(msg) {
@@ -1168,6 +1313,8 @@
       b.appendChild(div);
       b.scrollTop = b.scrollHeight;
     }
+
+
 
 
     function appendBotChat(msg) {
@@ -1186,6 +1333,8 @@
     }
 
 
+
+
     function updateWChecklist() {
       const keys = ['wie', 'wat', 'waar', 'wanneer', 'waarmee', 'hoe', 'signalement'];
       let count = 0;
@@ -1202,8 +1351,10 @@
     }
 
 
+
+
     /* =========================================================================
-       6. AUDIO & ECHTE PTT MICROFOON STREAMING (VOOR ALLE PTT KNOPPEN)
+       6. AUDIO & ECHTE PTT MICROFOON STREAMING (VOOR BEIDE SCHERMEN)
        ========================================================================= */
     let audioCtx = null;
     let micStream = null;
@@ -1212,10 +1363,13 @@
     let isRecording = false;
 
 
+
+
     async function initMicAndAudio() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') await audioCtx.resume();
+
 
         // Spraak-geoptimaliseerde microfoon: echoCancellation aan, ruisonderdrukking neutraal
         micStream = await navigator.mediaDevices.getUserMedia({
@@ -1235,10 +1389,14 @@
     }
 
 
+
+
     function playRadioChirp() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') audioCtx.resume();
+
+
 
 
         const now = audioCtx.currentTime;
@@ -1257,6 +1415,8 @@
     }
 
 
+
+
     function playSquelchNoise() {
       try {
         if (!audioCtx) return;
@@ -1267,6 +1427,8 @@
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
 
+
+
         const noise = audioCtx.createBufferSource();
         noise.buffer = buffer;
         const filter = audioCtx.createBiquadFilter();
@@ -1275,9 +1437,13 @@
         filter.Q.value = 2;
 
 
+
+
         const gain = audioCtx.createGain();
         gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+
 
 
         noise.connect(filter);
@@ -1288,16 +1454,22 @@
     }
 
 
-    // Helper functie om PTT touch- en muisgebeurtenissen uniform te koppelen
-    function bindPtt(btn) {
-      if (!btn || btn.dataset.pttBound) return;
-      btn.dataset.pttBound = "true";
+
+
+    const pttBtn = document.getElementById('btn-ptt');
+    const pttBtnVerhoor = document.getElementById('btn-ptt-verhoor');
+
+
+    [pttBtn, pttBtnVerhoor].forEach(btn => {
+      if (!btn) return;
       btn.addEventListener('mousedown', startVoiceRecording);
       btn.addEventListener('touchstart', (e) => { e.preventDefault(); startVoiceRecording(); });
       btn.addEventListener('mouseup', stopVoiceRecording);
       btn.addEventListener('touchend', (e) => { e.preventDefault(); stopVoiceRecording(); });
       btn.addEventListener('touchcancel', (e) => { e.preventDefault(); stopVoiceRecording(); });
-    }
+    });
+
+
 
 
     async function startVoiceRecording() {
@@ -1307,19 +1479,29 @@
         if (!micStream) return;
       }
 
+
       isRecording = true;
       audioChunks = [];
 
-      // Update alle PTT knoppen en statussen op het scherm
-      document.querySelectorAll('.btn-ptt-trigger').forEach(b => b.classList.add('ptt-active'));
-      document.querySelectorAll('.ptt-label-text').forEach(l => l.textContent = "● SPREEK NU...");
+
+      if (pttBtn) pttBtn.classList.add('ptt-active');
+      if (pttBtnVerhoor) pttBtnVerhoor.classList.add('ptt-active');
+
+
+      const lbl1 = document.getElementById('ptt-label');
+      const lbl2 = document.getElementById('ptt-label-verhoor');
+      if (lbl1) lbl1.textContent = "● SPREEK NU...";
+      if (lbl2) lbl2.textContent = "● SPREEK NU...";
+
 
       const stat1 = document.getElementById('lcd-status-label');
       const stat2 = document.getElementById('lcd-status-label-verhoor');
       if (stat1) stat1.textContent = "● TX (ZENDEN)";
       if (stat2) stat2.textContent = "● TX (ZENDEN)";
 
+
       playRadioChirp();
+
 
       try {
         const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
@@ -1338,31 +1520,31 @@
     }
 
 
+
+
     function stopVoiceRecording() {
       if (!isRecording) return;
       isRecording = false;
 
-      // Herstel alle PTT knoppen en labels
-      document.querySelectorAll('.btn-ptt-trigger').forEach(b => b.classList.remove('ptt-active'));
-      
-      const lblMain = document.getElementById('ptt-label');
-      if (lblMain) lblMain.textContent = "HOUD INGEDRUKT OM TE PRATEN (PTT)";
-      
-      const lblLoper = document.getElementById('ptt-label-loper');
-      if (lblLoper) lblLoper.textContent = "HOUD INGEDRUKT OM TE BEANTWOORDEN (PTT)";
 
-      const lblVerhoor = document.getElementById('ptt-label-verhoor');
-      if (lblVerhoor) lblVerhoor.textContent = "HOUD INGEDRUKT OM TE PRATEN (PTT)";
+      if (pttBtn) pttBtn.classList.remove('ptt-active');
+      if (pttBtnVerhoor) pttBtnVerhoor.classList.remove('ptt-active');
 
-      const lblChoice = document.getElementById('ptt-label-choice');
-      if (lblChoice) lblChoice.textContent = "HOUD INGEDRUKT VOOR OVERLEG MET OC (PTT)";
+
+      const lbl1 = document.getElementById('ptt-label');
+      const lbl2 = document.getElementById('ptt-label-verhoor');
+      if (lbl1) lbl1.textContent = "HOUD INGEDRUKT OM TE PRATEN (PTT)";
+      if (lbl2) lbl2.textContent = "HOUD INGEDRUKT OM TE PRATEN (PTT)";
+
 
       const stat1 = document.getElementById('lcd-status-label');
       const stat2 = document.getElementById('lcd-status-label-verhoor');
       if (stat1) stat1.textContent = "● STAND-BY";
       if (stat2) stat2.textContent = "● STAND-BY";
 
+
       playSquelchNoise();
+
 
       // Korte buffer van 80ms zodat het laatste woord niet abrupt wordt afgekapt
       setTimeout(() => {
@@ -1371,6 +1553,8 @@
         }
       }, 80);
     }
+
+
 
 
     function uploadVoiceMessage() {
@@ -1388,11 +1572,14 @@
     }
 
 
+
+
     function playIncomingVoice(base64Audio) {
       playRadioChirp();
       
       setTimeout(() => {
         const audio = new Audio(base64Audio);
+
 
         const stat1 = document.getElementById('lcd-status-label');
         const stat2 = document.getElementById('lcd-status-label-verhoor');
@@ -1400,11 +1587,13 @@
         if (stat2) stat2.textContent = "● RX (SPRAAK)";
         document.getElementById('lcd-main-title').textContent = "BERICHT ONTVANGEN";
 
+
         audio.play().catch(e => {
           console.log("Autoplay geblokkeerd:", e);
           if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
           audio.play().catch(() => {});
         });
+
 
         audio.onended = () => {
           playSquelchNoise();
@@ -1414,6 +1603,8 @@
         };
       }, 200);
     }
+
+
 
 
     /* =========================================================================
@@ -1428,6 +1619,8 @@
     let selectedLoginRole = 'rapporteur';
 
 
+
+
     const chanSel = document.getElementById('channel-select');
     const loginDuoSel = document.getElementById('login-duo-select');
     for (let i = 1; i <= 15; i++) {
@@ -1437,6 +1630,7 @@
       opt.textContent = val;
       chanSel.appendChild(opt);
 
+
       const optLogin = document.createElement('option');
       optLogin.value = val;
       optLogin.textContent = val;
@@ -1444,11 +1638,15 @@
     }
 
 
+
+
     chanSel.addEventListener('change', (e) => {
       currentDuo = e.target.value;
       document.getElementById('lcd-channel-label').textContent = `CH: ${currentDuo}`;
       listenForDuoData();
     });
+
+
 
 
     function selectLoginRole(role) {
@@ -1465,19 +1663,26 @@
     }
 
 
+
+
     function confirmLogin() {
       currentDuo = document.getElementById('login-duo-select').value;
       currentRole = selectedLoginRole;
 
+
       chanSel.value = currentDuo;
       document.getElementById('lcd-channel-label').textContent = `CH: ${currentDuo}`;
+
 
       updateRoleViews();
       listenForDuoData();
 
+
       document.getElementById('login-modal').classList.add('hidden');
       playRadioChirp();
     }
+
+
 
 
     function toggleUserRole() {
@@ -1487,11 +1692,15 @@
     }
 
 
+
+
     function updateRoleViews() {
       const btn = document.getElementById('role-toggle-btn');
       const vOc = document.getElementById('view-oc');
       const vLoper = document.getElementById('view-loper');
       const lcdRole = document.getElementById('lcd-role-label');
+
+
 
 
       if (currentRole === 'oc') {
@@ -1510,9 +1719,13 @@
     }
 
 
+
+
     function navigateToTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+
 
 
       const tabs = ['porto', 'verhoor', 'astma', 'feed'];
@@ -1526,10 +1739,14 @@
       });
 
 
+
+
       if (tabName === 'verhoor') {
         document.getElementById('chat-notification-dot').classList.add('hidden');
       }
     }
+
+
 
 
     /* =========================================================================
@@ -1539,12 +1756,16 @@
       e.preventDefault();
 
 
+
+
       const feedup = document.getElementById('input-feedup').value.trim();
       const a = document.getElementById('input-a').value.trim();
       const s = document.getElementById('input-s').value.trim();
       const t = document.getElementById('input-t').value.trim();
       const m = document.getElementById('input-m').value.trim();
       const afh = document.getElementById('input-afh').value.trim();
+
+
 
 
       const newMut = {
@@ -1560,17 +1781,25 @@
       };
 
 
+
+
       // Correct Firebase pad naar mutatieles5/mutations
       db.ref(`${DB_ROOT}/mutations/${newMut.id}`).set(newMut);
+
+
 
 
       document.getElementById('astma-form').reset();
       alert("✅ Mutatie opgeslagen! De rollen binnen " + currentDuo + " wisselen nu automatisch om.");
 
 
+
+
       toggleUserRole();
       navigateToTab('feed');
     }
+
+
 
 
     /* =========================================================================
@@ -1580,6 +1809,7 @@
       // Vorige listeners uitschakelen om dubbele audio / echo's te voorkomen
       db.ref(`${currentDuo}/voiceMsg`).off();
       db.ref(`${currentDuo}/mission`).off();
+
 
       // Voice listener
       db.ref(`${currentDuo}/voiceMsg`).on('value', snap => {
@@ -1592,10 +1822,14 @@
       });
 
 
+
+
       // Opdracht listener
       db.ref(`${currentDuo}/mission`).on('value', snap => {
         const data = snap.val();
         if (!data) return;
+
+
 
 
         const c = CASUSSEN.find(item => item.id === data.caseId);
@@ -1603,11 +1837,15 @@
           activeCase = c;
 
 
+
+
           if (currentRole === 'rapporteur') {
             playRadioChirp();
             document.getElementById('lcd-main-title').textContent = 'OPDRACHT ONTVANGEN!';
             document.getElementById('lcd-sub-title').textContent = c.locatie.name;
             document.getElementById('lcd-loc-tag').textContent = `LOC: ${c.locatie.id.toUpperCase()}`;
+
+
 
 
             document.getElementById('loper-instruction').innerHTML = `
@@ -1619,6 +1857,8 @@
         }
       });
     }
+
+
 
 
     /* =========================================================================
@@ -1640,10 +1880,14 @@
     });
 
 
+
+
     function renderFeedList(list) {
       cachedFeed = list;
       const box = document.getElementById('feed-list');
       document.getElementById('feed-count').textContent = `${list.length} ingediend`;
+
+
 
 
       if (list.length === 0) {
@@ -1652,7 +1896,10 @@
       }
 
 
+
+
       box.innerHTML = list.slice().reverse().map(m => {
+
 
         // ALERTMELDING BIJ VERKEERDE SIGNALEMENT-KEUZE DOOR DE RAPPORTEUR
         if (m.isAlert) {
@@ -1673,6 +1920,8 @@
         }
 
 
+
+
         // REGULIERE ASTMA MUTATIE
         const fbHtml = (m.feedbacks && m.feedbacks.length > 0)
           ? m.feedbacks.map(f => `
@@ -1690,6 +1939,8 @@
           : `<p class="text-slate-400 text-[10px] italic">Nog geen peer-feedback ontvangen.</p>`;
 
 
+
+
         return `
           <div class="bg-white rounded-xl p-3 border border-slate-200 space-y-2 shadow-sm text-slate-800">
             <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
@@ -1697,6 +1948,8 @@
               <span class="text-xs font-bold text-slate-900">${m.caseTitle}</span>
               <span class="text-[10px] text-slate-400 font-mono">${m.timestamp}</span>
             </div>
+
+
 
 
             <!-- FEED-UP PUNT WEERGAVE -->
@@ -1711,6 +1964,8 @@
             ` : ''}
 
 
+
+
             <div class="bg-slate-50 p-2 rounded-lg border border-slate-200 text-[11px] font-mono text-slate-700 space-y-1">
               <div><strong class="text-blue-700">A:</strong> ${m.astma ? m.astma.a : ''}</div>
               <div><strong class="text-blue-700">S:</strong> ${m.astma ? m.astma.s : ''}</div>
@@ -1718,6 +1973,8 @@
               <div><strong class="text-blue-700">M:</strong> ${m.astma ? m.astma.m : ''}</div>
               <div><strong class="text-blue-700">A:</strong> ${m.astma ? m.astma.afh : ''}</div>
             </div>
+
+
 
 
             <div class="flex justify-between items-center pt-1 border-t border-slate-100">
@@ -1728,6 +1985,8 @@
             </div>
 
 
+
+
             <div class="space-y-1 pt-1">${fbHtml}</div>
           </div>
         `;
@@ -1735,10 +1994,14 @@
     }
 
 
+
+
     function openFeedbackModal(mutId) {
       currentFeedbacksTargetId = mutId;
       const target = cachedFeed.find(m => m.id === mutId);
       if (!target) return;
+
+
 
 
       document.getElementById('feedback-preview-text').innerHTML = `
@@ -1750,15 +2013,21 @@
     }
 
 
+
+
     function closeFeedbackModal() {
       document.getElementById('feedback-modal').classList.add('hidden');
       currentFeedbacksTargetId = null;
     }
 
 
+
+
     function handlePeerFeedbackSubmit(e) {
       e.preventDefault();
       if (!currentFeedbacksTargetId) return;
+
+
 
 
       const fb = {
@@ -1771,6 +2040,8 @@
       };
 
 
+
+
       db.ref(`${DB_ROOT}/mutations/${currentFeedbacksTargetId}/feedbacks`).push(fb);
       closeFeedbackModal();
       document.getElementById('fb-top-text').value = '';
@@ -1779,12 +2050,16 @@
     }
 
 
+
+
     /* =========================================================================
        11. DATABASE RESETTEN (Master Reset Knop)
        ========================================================================= */
     function resetWholeDatabase() {
       const ok = confirm("⚠️ GEHELE DATABASE RESETTEN?\n\nHiermee wis je alle actieve oproepen, spraakberichten en mutaties voor de hele klas.");
       if (!ok) return;
+
+
 
 
       db.ref(DB_ROOT).remove()
@@ -1796,15 +2071,11 @@
     }
 
 
+
+
     // Start-up
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('lcd-channel-label').textContent = `CH: ${currentDuo}`;
-      
-      // Koppel alle vaste PTT knoppen op de pagina direct aan de spraakmotor
-      ['btn-ptt', 'btn-ptt-loper', 'btn-ptt-verhoor'].forEach(id => {
-        bindPtt(document.getElementById(id));
-      });
-
       updateRoleViews();
       listenForDuoData();
     });
